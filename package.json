@@ -1,0 +1,28 @@
+{
+  "name": "nm-gantt",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@12.21.0",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "pnpm --filter @nm/gantt-demo dev",
+    "build": "pnpm --filter @nm/gantt-demo build",
+    "typecheck": "pnpm -r typecheck",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "licenses": "node scripts/check-licenses.mjs",
+    "ci": "pnpm typecheck && pnpm test && pnpm run licenses && pnpm e2e",
+    "e2e": "pnpm --filter @nm/gantt-demo exec playwright test",
+    "preview": "pnpm --filter @nm/gantt-demo build && pnpm --filter @nm/gantt-demo preview"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.49.1",
+    "@types/node": "^22.10.0",
+    "fast-check": "^3.23.0",
+    "typescript": "^5.7.0",
+    "vitest": "^2.1.8"
+  }
+}

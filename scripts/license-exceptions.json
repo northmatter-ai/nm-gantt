@@ -1,0 +1,3 @@
+{
+  "caniuse-lite": "CC-BY-4.0 browser-support data used at build time by Babel via @vitejs/plugin-react (demo app only); never bundled. Needs sign-off — see DECISIONS.md D-012."
+}

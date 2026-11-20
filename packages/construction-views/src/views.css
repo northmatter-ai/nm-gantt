@@ -1,0 +1,172 @@
+/* @nm/construction-views. Categorical slots are a fixed order (never cycled); states use the status colours plus an icon and a pattern. */
+.nmc, .nmc-backdrop {
+  color-scheme: light;
+  --nmc-surface: #fcfcfb;
+  --nmc-surface-2: #f3f2ef;
+  --nmc-text: #0b0b0b;
+  --nmc-text-2: #52514e;
+  --nmc-border: #dedcd6;
+  --nmc-grid: #eceae5;
+  --nmc-s1: #2a78d6; --nmc-s2: #eb6834; --nmc-s3: #1baf7a; --nmc-s4: #eda100;
+  --nmc-s5: #e87ba4; --nmc-s6: #008300; --nmc-s7: #6250d6; --nmc-s8: #e34948;
+  --nmc-other: #9a998f;
+  --nmc-good: #0ca30c; --nmc-warning: #fab219; --nmc-critical: #d03b3b; --nmc-neutral: #e6e4df;
+  --nmc-data: #0ca30c;
+  --nmc-font: system-ui, -apple-system, 'Segoe UI', Roboto, 'Noto Sans', 'Noto Sans Devanagari', sans-serif;
+  color: var(--nmc-text);
+  font: 13px/1.4 var(--nmc-font);
+}
+@media (prefers-color-scheme: dark) {
+  :root:where(:not([data-theme='light'])) :is(.nmc, .nmc-backdrop) {
+    color-scheme: dark;
+    --nmc-surface: #1a1a19; --nmc-surface-2: #232321; --nmc-text: #f0efec; --nmc-text-2: #c3c2b7; --nmc-border: #3a3936; --nmc-grid: #2c2b29;
+    --nmc-s1: #3987e5; --nmc-s2: #d95926; --nmc-s3: #199e70; --nmc-s4: #c98500; --nmc-s5: #d55181; --nmc-s6: #0ca30c; --nmc-s7: #9085e9; --nmc-s8: #e66767;
+    --nmc-other: #7d7c74; --nmc-neutral: #33322f;
+  }
+}
+:root[data-theme='dark'] :is(.nmc, .nmc-backdrop) {
+  color-scheme: dark;
+  --nmc-surface: #1a1a19; --nmc-surface-2: #232321; --nmc-text: #f0efec; --nmc-text-2: #c3c2b7; --nmc-border: #3a3936; --nmc-grid: #2c2b29;
+  --nmc-s1: #3987e5; --nmc-s2: #d95926; --nmc-s3: #199e70; --nmc-s4: #c98500; --nmc-s5: #d55181; --nmc-s6: #0ca30c; --nmc-s7: #9085e9; --nmc-s8: #e66767;
+  --nmc-other: #7d7c74; --nmc-neutral: #33322f;
+}
+.nmc { background: var(--nmc-surface); border: 1px solid var(--nmc-border); border-radius: 8px; padding: 12px 16px; }
+.nmc-muted { color: var(--nmc-text-2); font-weight: 400; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.nmc button, .nmc select, .nmc input { font: inherit; color: var(--nmc-text); }
+.nmc-btn, .nmc-toolbar select, .nmc-toolbar input, .nmc-seg button, .nmc-chip-ctl {
+  background: var(--nmc-surface); border: 1px solid var(--nmc-border); border-radius: 6px; padding: 4px 10px; min-height: 28px; cursor: pointer;
+}
+.nmc-toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; margin-bottom: 10px; }
+.nmc-toolbar label { display: inline-flex; align-items: center; gap: 6px; color: var(--nmc-text-2); }
+.nmc-seg { display: inline-flex; }
+.nmc-seg button { border-radius: 0; }
+.nmc-seg button:first-child { border-radius: 6px 0 0 6px; }
+.nmc-seg button:last-child { border-radius: 0 6px 6px 0; border-left: 0; }
+.nmc-seg button[aria-pressed='true'] { background: var(--nmc-surface-2); font-weight: 600; }
+
+/* ------------------------------------------------ state swatches (colour + icon + pattern) */
+.nmc-swatch, .nmc-cell {
+  display: inline-grid; place-items: center; font-size: 11px; font-weight: 700; line-height: 1;
+}
+.nmc-swatch { width: 18px; height: 18px; border-radius: 4px; margin-right: 6px; vertical-align: -4px; }
+.s-not_started { background: var(--nmc-neutral); color: var(--nmc-text-2); }
+.s-in_progress { background: var(--nmc-warning); color: #1d1a10; }
+.s-late { background: var(--nmc-critical); color: #fff; }
+.s-certified { background: var(--nmc-good); color: #fff; }
+/* Reported but not certified: same hue, hatched, so it never reads as certified. */
+.s-reported {
+  background: repeating-linear-gradient(45deg, var(--nmc-good) 0 3px, var(--nmc-surface) 3px 6px);
+  color: var(--nmc-text); box-shadow: inset 0 0 0 1.5px var(--nmc-good);
+}
+.s-reported > span { background: var(--nmc-surface); border-radius: 3px; padding: 1px 2px; }
+.nmc-legend { display: flex; flex-wrap: wrap; gap: 6px 18px; margin-bottom: 12px; color: var(--nmc-text-2); font-size: 12px; }
+
+/* ------------------------------------------------ tower × floor grid */
+.nmc-grid-row { display: flex; flex-wrap: wrap; gap: 24px; align-items: flex-start; }
+.nmc-tower { flex: 1 1 360px; min-width: 0; }
+.nmc-tower h2 { font-size: 14px; margin: 0 0 8px; display: flex; gap: 10px; align-items: baseline; }
+.nmc-tf { display: grid; gap: 2px; overflow-x: auto; }
+.nmc-tf-row { display: contents; }
+.nmc-corner, .nmc-floor { font-size: 11px; color: var(--nmc-text-2); padding-right: 8px; display: flex; align-items: center; white-space: nowrap; }
+.nmc-corner { align-items: flex-end; padding-bottom: 4px; }
+.nmc-tf-col { height: 96px; display: flex; align-items: flex-end; justify-content: center; font-size: 11px; color: var(--nmc-text-2); overflow: hidden; }
+.nmc-tf-col span { writing-mode: vertical-rl; transform: rotate(180deg); white-space: nowrap; max-height: 96px; overflow: hidden; text-overflow: ellipsis; padding-bottom: 2px; }
+.nmc-cell { height: 22px; border: 0; border-radius: 3px; padding: 0; cursor: pointer; }
+.nmc-cell.empty { background: transparent; cursor: default; }
+.nmc-cell:hover { outline: 2px solid var(--nmc-text); outline-offset: 0; }
+.nmc-cell:focus-visible { outline: 2px solid var(--nmc-s1); outline-offset: 1px; }
+
+/* ------------------------------------------------ line of balance */
+.nmc-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+.nmc-chip { display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px 3px 6px; border: 1px solid var(--nmc-border); border-radius: 999px; font-size: 12px; cursor: pointer; }
+.nmc-chip input { margin: 0; }
+.nmc-chip.off { color: var(--nmc-text-2); opacity: 0.75; }
+.nmc-chip-sw { display: inline-block; width: 12px; height: 4px; border-radius: 2px; vertical-align: middle; }
+.nmc-key { display: inline-flex; align-items: center; gap: 6px; color: var(--nmc-text-2); font-size: 12px; }
+.nmc-key-line { stroke: var(--nmc-text-2); stroke-width: 2; }
+.nmc-key-line.dashed { stroke-dasharray: 5 3; }
+.nmc-clash-key { display: inline-grid; place-items: center; width: 16px; height: 16px; border-radius: 50%; background: var(--nmc-critical); color: #fff; font-weight: 700; font-size: 11px; }
+.nmc-lob-plot { position: relative; width: 100%; }
+.nmc-lob-plot svg { display: block; }
+.nmc-axis text { fill: var(--nmc-text-2); font-size: 11px; }
+.nmc-axis .nmc-axis-top { fill: var(--nmc-text); font-weight: 600; }
+.nmc-axis-title { font-weight: 600; }
+.nmc-gridline { stroke: var(--nmc-grid); stroke-width: 1; }
+.nmc-gridline.faint { stroke-dasharray: 2 4; }
+.nmc-plot-frame { fill: none; stroke: var(--nmc-border); }
+.nmc-data-line { stroke: var(--nmc-data); stroke-width: 1.5; }
+.nmc-data-label { fill: var(--nmc-text-2); font-size: 11px; }
+.nmc-series { transition: opacity 120ms; }
+.nmc-series.dim { opacity: 0.25; }
+.nmc-line { fill: none; stroke: currentColor; stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+.nmc-line.dashed { stroke-dasharray: 6 4; }
+.nmc-dot { fill: currentColor; stroke: var(--nmc-surface); stroke-width: 2; }
+.nmc-dot.hollow { fill: var(--nmc-surface); stroke: currentColor; }
+.nmc-hit { fill: none; stroke: transparent; stroke-width: 14; cursor: crosshair; }
+.nmc-direct { fill: var(--nmc-text); font-size: 11px; }
+.nmc-clash circle { fill: var(--nmc-critical); stroke: var(--nmc-surface); stroke-width: 2; }
+.nmc-clash text { fill: #fff; font-size: 11px; font-weight: 700; pointer-events: none; }
+.nmc-tip { position: absolute; z-index: 5; pointer-events: none; min-width: 200px; padding: 8px 10px; border-radius: 6px; background: var(--nmc-surface); border: 1px solid var(--nmc-border); box-shadow: 0 6px 20px rgba(0,0,0,.18); font-size: 12px; }
+.nmc-tip strong { display: block; margin-bottom: 4px; }
+
+/* ------------------------------------------------ tables (LOB table view, look-ahead board) */
+.nmc-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.nmc-table th, .nmc-table td { padding: 6px 8px; border-bottom: 1px solid var(--nmc-grid); text-align: left; vertical-align: top; }
+.nmc-table thead th { position: sticky; top: 0; background: var(--nmc-surface); color: var(--nmc-text-2); font-weight: 600; border-bottom: 1px solid var(--nmc-border); z-index: 1; }
+.nmc-table .num { text-align: right; font-variant-numeric: tabular-nums; }
+.nmc-table .neg { color: var(--nmc-critical); font-weight: 600; }
+.nmc-group.tower th { background: var(--nmc-surface-2); font-size: 13px; padding-top: 10px; }
+.nmc-group.contractor th { font-weight: 600; color: var(--nmc-text); }
+.nmc-ppc { float: right; font-weight: 600; font-variant-numeric: tabular-nums; }
+.nmc-board .ready-col { text-align: center; white-space: nowrap; }
+.nmc-board td.ready-col.ok { color: var(--nmc-good); font-weight: 700; }
+.nmc-board td.ready-col.na { color: var(--nmc-text-2); }
+.nmc-board td.ready-col.bad { color: var(--nmc-critical); font-weight: 700; text-align: left; }
+.nmc-board td.ready-col.bad .owner { color: var(--nmc-text); font-weight: 400; font-size: 11px; }
+.nmc-board tr.not-ready td:first-child { box-shadow: inset 3px 0 0 var(--nmc-critical); }
+.nmc-code { display: block; font-size: 11px; }
+.nmc-linkish { background: none; border: 0; padding: 0; color: var(--nmc-text); text-decoration: underline; text-decoration-color: var(--nmc-border); cursor: pointer; text-align: left; }
+.nmc-pill { display: inline-block; padding: 1px 6px; border-radius: 999px; font-size: 11px; font-weight: 600; border: 1px solid currentColor; white-space: nowrap; }
+.nmc-pill.passed { color: var(--nmc-good); }
+.nmc-pill.failed { color: var(--nmc-critical); }
+.nmc-pill.pending { color: var(--nmc-text-2); }
+.nmc-print-title { display: none; }
+
+/* ------------------------------------------------ details dialog */
+.nmc-backdrop { position: fixed; inset: 0; z-index: 80; display: grid; place-items: center; padding: 16px; background: rgba(10, 12, 16, 0.45); }
+.nmc-dialog { width: min(560px, 100%); max-height: calc(100vh - 32px); display: flex; flex-direction: column; background: var(--nmc-surface); color: var(--nmc-text); border-radius: 10px; box-shadow: 0 20px 60px rgba(0,0,0,.35); outline: none; }
+.nmc-dialog header, .nmc-dialog footer { display: flex; align-items: flex-start; gap: 8px; padding: 12px 16px; border-bottom: 1px solid var(--nmc-border); }
+.nmc-dialog footer { border-bottom: 0; border-top: 1px solid var(--nmc-border); justify-content: flex-end; }
+.nmc-dialog header > div { flex: 1; display: grid; gap: 2px; }
+.nmc-x { border: 0; background: none; font-size: 20px; line-height: 1; cursor: pointer; color: var(--nmc-text-2); }
+.nmc-dialog-body { padding: 12px 16px 16px; overflow: auto; }
+.nmc-dialog h3 { font-size: 12px; margin: 14px 0 6px; color: var(--nmc-text-2); text-transform: uppercase; letter-spacing: .04em; }
+.nmc-state-line { display: flex; align-items: center; margin: 0 0 10px; font-weight: 600; }
+.nmc-dl { display: grid; grid-template-columns: max-content 1fr; gap: 4px 16px; margin: 0; }
+.nmc-dl dt { color: var(--nmc-text-2); }
+.nmc-dl dd { margin: 0; font-variant-numeric: tabular-nums; }
+.nmc-inspections { list-style: none; padding: 0; margin: 0; display: grid; gap: 4px; }
+.nmc-photos { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 8px; }
+.nmc-photos figure { margin: 0; }
+.nmc-photos img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 6px; display: block; background: var(--nmc-surface-2); }
+.nmc-photos figcaption { font-size: 11px; color: var(--nmc-text-2); margin-top: 2px; }
+
+@media (max-width: 640px) {
+  .nmc { padding: 10px; }
+  .nmc-board { display: block; overflow-x: auto; }
+}
+
+/* ------------------------------------------------ print: look-ahead only, with a title block */
+@media print {
+  body.nmc-printing * { visibility: hidden; }
+  body.nmc-printing .nmc-lookahead, body.nmc-printing .nmc-lookahead * { visibility: visible; }
+  body.nmc-printing .nmc-lookahead { position: absolute; inset: 0 auto auto 0; width: 100%; border: 0; padding: 0; }
+  .nmc-lookahead .no-print { display: none; }
+  .nmc-print-title { display: block; margin-bottom: 8px; }
+  .nmc-print-title h2 { font-size: 16px; margin: 0; }
+  .nmc-print-title p { margin: 2px 0 0; font-size: 11px; }
+  .nmc-table thead { display: table-header-group; }
+  .nmc-table tr { break-inside: avoid; }
+  @page { size: A4 landscape; margin: 12mm; }
+}

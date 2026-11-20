@@ -1,0 +1,28 @@
+{
+  "name": "@nm/gantt-demo",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --port 3600",
+    "build": "tsc -p tsconfig.json && vite build",
+    "preview": "vite preview --port 3600",
+    "typecheck": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "@nm/calendar": "workspace:*",
+    "@nm/gantt": "workspace:*",
+    "@nm/schedule-commands": "workspace:*",
+    "@nm/schedule-engine": "workspace:*",
+    "@nm/schedule-io": "workspace:*",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "@nm/construction-views": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "@vitejs/plugin-react": "^4.3.4",
+    "vite": "^6.0.7"
+  }
+}
