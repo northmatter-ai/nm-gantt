@@ -2,7 +2,7 @@
  * The time scale: one function maps an instant to x, x = (t − viewStart) × pixelsPerMinute.
  * Header ticks are generated only for the visible range.
  */
-import { dayStartInstant, dayToYmd, instantToDay, weekdayOfDay, ymdToDay, type Minutes } from '@nm/calendar';
+import { dayStartInstant, dayToYmd, instantToDay, weekdayOfDay, ymdToDay, type Minutes } from '@northmatter-ai/calendar';
 import type { Zoom } from './types.js';
 
 /** Pixels per calendar day at each zoom level. */

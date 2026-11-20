@@ -1,5 +1,5 @@
 /**
- * @nm/gantt — grid on the left, timeline on the right, one vertical scroll.
+ * @northmatter-ai/gantt — grid on the left, timeline on the right, one vertical scroll.
  * Holds no business rules: user actions become commands, previewed by the engine in a Web Worker,
  * then sent through onCommands; the server's result always wins.
  */
@@ -18,8 +18,8 @@ import {
   type PointerEvent as ReactPointerEvent,
 } from 'react';
 import { useVirtualizer } from '@tanstack/react-virtual';
-import { compileCalendars, dayToIso, ELAPSED, instantFromEpochMs, parseLocal, type CompiledCalendar, type Minutes } from '@nm/calendar';
-import type { LinkType, ScheduleResult } from '@nm/schedule-engine';
+import { compileCalendars, dayToIso, ELAPSED, instantFromEpochMs, parseLocal, type CompiledCalendar, type Minutes } from '@northmatter-ai/calendar';
+import type { LinkType, ScheduleResult } from '@northmatter-ai/schedule-engine';
 import {
   applyCommands,
   childrenOf,
@@ -37,8 +37,9 @@ import {
   type Command,
   type LinkRecord,
   type ScheduleDoc,
-} from '@nm/schedule-commands';
+} from '@northmatter-ai/schedule-commands';
 import { ActivityEditor, LinkEditor } from './ActivityEditor.js';
+import { ProjectSetup } from './ProjectSetup.js';
 import { ContextMenu, Legend, type MenuItem } from './Chrome.js';
 import { fmtDate, fmtFloat } from './format.js';
 import { columnTitle, translator } from './i18n.js';
@@ -62,6 +63,8 @@ export interface GanttHandle {
   collapseAll(): void;
   /** Expand its ancestors, select it and scroll it into view. */
   focusActivity(id: string): void;
+  /** Open the towers, floors & trades dialog. */
+  openSetup(): void;
 }
 
 type Drag =
@@ -73,11 +76,15 @@ type Drag =
 
 const isMilestone = (a: ActivityRecord) => a.type === 'start_milestone' || a.type === 'finish_milestone';
 
+/** Undo and redo stacks of inverse command batches. Pass one to <Gantt history> to keep it across remounts. */
+export interface UndoHistory { undo: Command[][]; redo: Command[][] }
+export const createUndoHistory = (): UndoHistory => ({ undo: [], redo: [] });
+
 export const Gantt = forwardRef<GanttHandle, GanttProps>(function Gantt(props, ref) {
   const {
     version, mode = 'edit', columns: columnsProp, zoom: zoomProp, onZoomChange, showBaselineId, showFloat = false,
     filter, groupBy = 'wbs', onCommands, onSelect, compact = false, locale = 'en', today: todayProp, userKey = 'default',
-    createWorker, height = '100%',
+    createWorker, height = '100%', history: historyProp,
   } = props;
   const t = useMemo(() => translator(locale), [locale]);
   const print = mode === 'print';
@@ -98,7 +105,10 @@ export const Gantt = forwardRef<GanttHandle, GanttProps>(function Gantt(props, r
   }, [version.doc, version.results]);
 
   const preview = usePreview(createWorker, (r, d) => { if (d === docRef.current) setResults(r); });
-  const history = useRef<{ undo: Command[][]; redo: Command[][] }>({ undo: [], redo: [] });
+  // Undo history: the host's store when given (so it outlives this component), else our own.
+  const ownHistory = useRef<UndoHistory>(createUndoHistory());
+  const history = useRef<UndoHistory>(historyProp ?? ownHistory.current);
+  history.current = historyProp ?? ownHistory.current;
   const [, bump] = useState(0);
 
   const run = useCallback(async (cmds: Command[], record: 'do' | 'undo' | 'redo' = 'do'): Promise<boolean> => {
@@ -111,7 +121,7 @@ export const Gantt = forwardRef<GanttHandle, GanttProps>(function Gantt(props, r
       return false;
     }
     const h = history.current;
-    if (record === 'do') { h.undo.push(applied.inverse); if (h.undo.length > 100) h.undo.shift(); h.redo = []; }
+    if (record === 'do') { h.undo.push(applied.inverse); if (h.undo.length > 100) h.undo.shift(); h.redo.length = 0; }
     else if (record === 'undo') h.redo.push(applied.inverse);
     else h.undo.push(applied.inverse);
     bump((n) => n + 1);
@@ -127,7 +137,8 @@ export const Gantt = forwardRef<GanttHandle, GanttProps>(function Gantt(props, r
         if (pending.current === 0) {
           setDoc(latestVersion.current.doc);
           setResults(latestVersion.current.results);
-          history.current = { undo: [], redo: [] };
+          history.current.undo.length = 0;
+          history.current.redo.length = 0;
         }
         return false;
       }
@@ -459,10 +470,12 @@ export const Gantt = forwardRef<GanttHandle, GanttProps>(function Gantt(props, r
       setSelected([id]);
       setPendingFocus(id);
     },
+    openSetup: () => setSetupOpen(true),
     collapseAll: () => setCollapsed(new Set([...doc.activities.filter((a) => a.type === 'summary').map((a) => a.id), ...rows.filter((r) => r.kind === 'group').map((r) => r.key)])),
   }), [undo, redo, scale, addBelow, selected, doc.activities, rows, tree]);
 
   const [pendingFocus, setPendingFocus] = useState<string | null>(null);
+  const [setupOpen, setSetupOpen] = useState(false);
   useEffect(() => {
     if (!pendingFocus) return;
     const i = rowIndex.get(pendingFocus);
@@ -1158,6 +1171,11 @@ export const Gantt = forwardRef<GanttHandle, GanttProps>(function Gantt(props, r
         <ActivityEditor doc={doc} activity={editorAct} cal={calOf(editorAct)} tz={tz} t={t} readOnly={!editable}
           onClose={() => { setEditorId(null); gridRef.current?.focus(); }}
           onSave={(cmds) => { setEditorId(null); void run(cmds); }} />
+      )}
+      {setupOpen && (
+        <ProjectSetup doc={doc} t={t} readOnly={!editable}
+          onClose={() => { setSetupOpen(false); gridRef.current?.focus(); }}
+          onSave={(cmds) => { setSetupOpen(false); if (cmds.length) void run(cmds); }} />
       )}
       {linkEdit && (
         <LinkEditor link={linkEdit} doc={doc} hoursPerDay={defaultCal.hoursPerDay} t={t}

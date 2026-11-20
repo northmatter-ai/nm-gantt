@@ -2,9 +2,9 @@
  * Phone view model (spec: "View and mobile modes"): a simplified list-plus-bars of one tower or the
  * look-ahead window. Pure; the component in Phone.tsx renders it. Rules: DECISIONS.md D-031.
  */
-import { dayStartInstant, instantToDay, instantToLocal, weekdayOfDay, type Minutes } from '@nm/calendar';
-import type { ActivityRecord, ScheduleDoc } from '@nm/schedule-commands';
-import type { ActivityResult, ScheduleResult } from '@nm/schedule-engine';
+import { dayStartInstant, instantToDay, instantToLocal, weekdayOfDay, type Minutes } from '@northmatter-ai/calendar';
+import type { ActivityRecord, ScheduleDoc } from '@northmatter-ai/schedule-commands';
+import type { ActivityResult, ScheduleResult } from '@northmatter-ai/schedule-engine';
 
 export type PhoneScope =
   | { kind: 'lookahead'; weeks: number }

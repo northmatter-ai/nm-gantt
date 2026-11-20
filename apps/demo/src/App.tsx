@@ -1,16 +1,16 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { formatLocal, instantFromEpochMs, parseLocal } from '@nm/calendar';
-import { Gantt, PhoneSchedule, type FilterSpec, type GanttHandle, type GroupBy, type Locale, type Zoom } from '@nm/gantt';
-import { LineOfBalance, LookAhead, TowerFloorGrid } from '@nm/construction-views';
-import { toScheduleInput } from '@nm/schedule-commands';
-import { calculate } from '@nm/schedule-engine';
-import { excelTemplate, exportExcel, exportMspdi, importExcel, importMspdi } from '@nm/schedule-io';
+import { formatLocal, instantFromEpochMs, parseLocal } from '@northmatter-ai/calendar';
+import { createUndoHistory, Gantt, PhoneSchedule, type FilterSpec, type GanttHandle, type GroupBy, type Locale, type Zoom } from '@northmatter-ai/gantt';
+import { LineOfBalance, LookAhead, TowerFloorGrid } from '@northmatter-ai/construction-views';
+import { toScheduleInput } from '@northmatter-ai/schedule-commands';
+import { calculate } from '@northmatter-ai/schedule-engine';
+import { excelTemplate, exportExcel, exportMspdi, importExcel, importMspdi } from '@northmatter-ai/schedule-io';
 import { MockPlanningServer, type ServerState } from './mockServer';
-import { blankProject, calendars, largeSchedule, sampleSchedule, stressTower, withProgress } from './sample';
+import { blankProject, calendars, FLOOR_TEMPLATES, largeSchedule, sampleSchedule, stressTower, withProgress } from './sample';
 import { ImportDialog, type PendingImport } from './ImportDialog';
 import { NewProjectDialog, type NewProjectInput } from './NewProjectDialog';
 import { listProjects, newProjectId, projectSource, projectStorageKey, removeProjectData, saveProjects, STORAGE, type ProjectEntry } from './projects';
-import type { ScheduleDoc } from '@nm/schedule-commands';
+import type { ScheduleDoc } from '@northmatter-ai/schedule-commands';
 import { mockSite } from './siteMock';
 
 /** 'sample' | 'large' | 'tower40' | `p:<project id>` */
@@ -80,6 +80,8 @@ export function App() {
   const [epoch, setEpoch] = useState(0);
   const setServer = (s: MockPlanningServer) => { setServerRaw(s); setEpoch((n) => n + 1); };
   const [state, setState] = useState<ServerState>(server.current);
+  // One undo history per open project; it outlives the Gantt when you switch tabs.
+  const undoHistory = useMemo(() => createUndoHistory(), [server]);
   useEffect(() => { setState(server.current); return server.subscribe(setState); }, [server]);
 
   const [zoom, setZoom] = useState<Zoom>('week');
@@ -104,6 +106,17 @@ export function App() {
   const site = useMemo(() => mockSite(state.doc, state.results), [state.doc, state.results]);
   const pendingFocus = useRef<string | null>(null);
   const openInGantt = (id: string) => { pendingFocus.current = id; setTab('gantt'); };
+  const pendingSetup = useRef(false);
+  const openSetup = () => {
+    if (tab === 'gantt') { gantt.current?.openSetup(); return; }
+    pendingSetup.current = true;
+    setTab('gantt');
+  };
+  useEffect(() => {
+    if (tab !== 'gantt' || !pendingSetup.current) return;
+    pendingSetup.current = false;
+    requestAnimationFrame(() => gantt.current?.openSetup());
+  }, [tab]);
   useEffect(() => {
     if (tab !== 'gantt' || !pendingFocus.current) return;
     const id = pendingFocus.current;
@@ -173,7 +186,7 @@ export function App() {
       const name = file.name.replace(/\.(xml|xlsx)$/i, '');
       const today = formatLocal('Asia/Kolkata', instantFromEpochMs(Date.now())).slice(0, 10);
       const { doc, report: r } = isExcel
-        ? importExcel(await file.arrayBuffer(), { name, calendars: calendars(), defaultCalendarId: 'site', projectStart: parseLocal('Asia/Kolkata', `${today}T09:00`) })
+        ? importExcel(await file.arrayBuffer(), { name, calendars: calendars(), defaultCalendarId: 'site', templates: FLOOR_TEMPLATES.map((x) => ({ id: x.key, name: x.name, short: x.short })), projectStart: parseLocal('Asia/Kolkata', `${today}T09:00`) })
         : importMspdi(await file.text(), { name });
       setReport(null);
       setPendingImport({ doc, report: r, fileName: file.name, format: isExcel ? 'Excel' : 'MS Project XML', name: doc.name || name });
@@ -277,6 +290,7 @@ export function App() {
           <button type="button" onClick={() => gantt.current?.undo()} title="Undo (Ctrl/Cmd+Z)" aria-label="Undo">↶</button>
           <button type="button" onClick={() => gantt.current?.redo()} title="Redo (Shift+Ctrl/Cmd+Z)" aria-label="Redo">↷</button>
           <button type="button" onClick={() => gantt.current?.addActivity()} disabled={mode !== 'edit'}>+ Activity</button>
+          <button type="button" onClick={openSetup} disabled={mode !== 'edit'} title="Add, rename and order towers, floors and trades">Towers, floors & trades…</button>
           <button type="button" onClick={() => gantt.current?.scrollToDate(instantFromEpochMs(Date.now()))}>Today</button>
           <button type="button" onClick={() => gantt.current?.expandAll()}>Expand</button>
           <button type="button" onClick={() => gantt.current?.collapseAll()}>Collapse</button>
@@ -360,6 +374,7 @@ export function App() {
             locale={locale}
             onCommands={onCommands}
             onSelect={setSelected}
+            history={undoHistory}
             userKey="demo"
           />
         )}

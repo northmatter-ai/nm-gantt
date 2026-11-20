@@ -1,5 +1,5 @@
-import { formatLocal, instantToLocal, parseLocal, type Minutes } from '@nm/calendar';
-import { formatDuration } from '@nm/schedule-commands';
+import { formatLocal, instantToLocal, parseLocal, type Minutes } from '@northmatter-ai/calendar';
+import { formatDuration } from '@northmatter-ai/schedule-commands';
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 const pad = (n: number) => String(n).padStart(2, '0');

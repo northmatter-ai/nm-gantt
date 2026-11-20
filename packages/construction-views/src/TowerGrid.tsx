@@ -3,9 +3,9 @@
  * construction order, each cell the activity for that floor and template, coloured and patterned by state.
  */
 import { memo, useMemo, useState } from 'react';
-import type { BaselineView, ScheduleDoc } from '@nm/schedule-commands';
-import type { ScheduleResult } from '@nm/schedule-engine';
-import { fmtDate } from '@nm/gantt';
+import type { BaselineView, ScheduleDoc } from '@northmatter-ai/schedule-commands';
+import type { ScheduleResult } from '@northmatter-ai/schedule-engine';
+import { fmtDate } from '@northmatter-ai/gantt';
 import { buildTowerGrid, CELL_STATES, towersOf, type SiteData } from './model.js';
 import { ActivityDetails } from './ActivityDetails.js';
 import { StateIcon } from './StateIcon.js';
@@ -38,7 +38,7 @@ export function TowerFloorGrid({ doc, results, site, towerIds, baseline, locale 
             <h2>{g.towerName} <span className="nmc-muted">{g.counts.certified}/{g.cells.size} {t('certified').toLowerCase()}</span></h2>
             {g.cells.size === 0 ? <p className="nmc-muted">{t('noData')}</p> : (
               <div className="nmc-tf" role="grid" aria-rowcount={g.floors.length + 1} aria-colcount={g.templates.length + 1}
-                style={{ gridTemplateColumns: `minmax(64px, max-content) repeat(${g.templates.length}, minmax(22px, 1fr))` }}>
+                style={{ gridTemplateColumns: `minmax(64px, max-content) repeat(${g.templates.length}, minmax(22px, 72px))` }}>
                 <div role="row" className="nmc-tf-row head">
                   <div role="columnheader" className="nmc-corner">{t('floor')}</div>
                   {g.templates.map((tp) => (

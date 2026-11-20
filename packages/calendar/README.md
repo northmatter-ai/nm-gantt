@@ -1,4 +1,4 @@
-# @nm/calendar
+# @northmatter-ai/calendar
 
 Working-time arithmetic on integer minutes (UTC instants, working-minute durations). No dependencies; time zones via `Intl` only.
 

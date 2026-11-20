@@ -3,10 +3,10 @@
  * progress, grouped by tower and contractor, with Site readiness, this week's commitments and PPC.
  */
 import { useMemo, useState } from 'react';
-import { formatLocal, instantFromEpochMs, parseLocal, type Minutes } from '@nm/calendar';
-import { fmtDate } from '@nm/gantt';
-import { formatDuration, type ScheduleDoc } from '@nm/schedule-commands';
-import type { ScheduleResult } from '@nm/schedule-engine';
+import { formatLocal, instantFromEpochMs, parseLocal, type Minutes } from '@northmatter-ai/calendar';
+import { fmtDate } from '@northmatter-ai/gantt';
+import { formatDuration, type ScheduleDoc } from '@northmatter-ai/schedule-commands';
+import type { ScheduleResult } from '@northmatter-ai/schedule-engine';
 import { buildLookahead, READINESS_KEYS, towersOf, type Readiness, type SiteData } from './model.js';
 import { ActivityDetails } from './ActivityDetails.js';
 import { vt, type VT } from './i18n.js';

@@ -1,19 +1,60 @@
 {
-  "name": "@nm/schedule-io",
+  "name": "@northmatter-ai/schedule-io",
   "version": "0.1.0",
-  "private": true,
+  "description": "Import and export NorthMatter schedules as MS Project XML (MSPDI) and Excel (.xlsx).",
+  "keywords": [
+    "scheduling",
+    "cpm",
+    "construction",
+    "northmatter"
+  ],
+  "license": "MIT",
+  "author": "NorthMatter AI",
+  "homepage": "https://github.com/northmatter-ai/nm-gantt/tree/main/packages/schedule-io#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/northmatter-ai/nm-gantt.git",
+    "directory": "packages/schedule-io"
+  },
+  "bugs": {
+    "url": "https://github.com/northmatter-ai/nm-gantt/issues"
+  },
   "type": "module",
-  "license": "UNLICENSED",
+  "sideEffects": [
+    "*.css"
+  ],
   "exports": {
     ".": "./src/index.ts"
   },
+  "files": [
+    "dist",
+    "src",
+    "!src/**/*.test.*",
+    "README.md",
+    "LICENSE"
+  ],
+  "publishConfig": {
+    "access": "public",
+    "exports": {
+      ".": {
+        "types": "./dist/index.d.ts",
+        "import": "./dist/index.js"
+      }
+    },
+    "main": "./dist/index.js",
+    "types": "./dist/index.d.ts"
+  },
   "scripts": {
+    "build": "node ../../scripts/build-package.mjs",
     "typecheck": "tsc -p tsconfig.json"
   },
+  "engines": {
+    "node": ">=18"
+  },
   "dependencies": {
-    "@nm/calendar": "workspace:*",
-    "@nm/schedule-commands": "workspace:*",
-    "@nm/schedule-engine": "workspace:*",
+    "@northmatter-ai/calendar": "workspace:*",
+    "@northmatter-ai/schedule-commands": "workspace:*",
+    "@northmatter-ai/schedule-engine": "workspace:*",
     "fast-xml-parser": "^4.5.1",
     "fflate": "0.8.2"
   }

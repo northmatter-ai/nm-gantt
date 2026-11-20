@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import { defaultTenantCalendar, formatLocal, parseLocal } from '@nm/calendar';
-import { calculate } from '@nm/schedule-engine';
-import { toScheduleInput, type ActivityRecord, type ScheduleDoc } from '@nm/schedule-commands';
+import { defaultTenantCalendar, formatLocal, parseLocal } from '@northmatter-ai/calendar';
+import { calculate } from '@northmatter-ai/schedule-engine';
+import { toScheduleInput, type ActivityRecord, type ScheduleDoc } from '@northmatter-ai/schedule-commands';
 import { buildPhoneList, clampWeeks, weekStart, zoomWindow, type PhoneItem } from '../src/phoneModel.js';
 
 const TZ = 'Asia/Kolkata';

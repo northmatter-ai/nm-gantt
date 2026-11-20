@@ -3,9 +3,9 @@
  * Field codes follow Microsoft's published MSPDI schema; anything not mapped is listed in the report.
  */
 import { XMLBuilder, XMLParser } from 'fast-xml-parser';
-import { dayToIso, formatLocal, instantToDay, parseLocal, type CalendarException, type CalendarInput, type Interval, type Minutes, type Weekday } from '@nm/calendar';
-import { calculate, type ActivityType, type ConstraintType, type Issue, type LinkType, type ScheduleResult } from '@nm/schedule-engine';
-import { evenKeys, toScheduleInput, type ActivityRecord, type LinkRecord, type ScheduleDoc } from '@nm/schedule-commands';
+import { dayToIso, formatLocal, instantToDay, parseLocal, type CalendarException, type CalendarInput, type Interval, type Minutes, type Weekday } from '@northmatter-ai/calendar';
+import { calculate, type ActivityType, type ConstraintType, type Issue, type LinkType, type ScheduleResult } from '@northmatter-ai/schedule-engine';
+import { evenKeys, toScheduleInput, type ActivityRecord, type LinkRecord, type ScheduleDoc } from '@northmatter-ai/schedule-commands';
 import { resolveLinks, type PendingLink } from './links.js';
 
 export interface ImportReport {

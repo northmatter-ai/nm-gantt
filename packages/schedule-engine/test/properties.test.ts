@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import fc from 'fast-check';
-import { compileCalendar } from '@nm/calendar';
+import { compileCalendar } from '@northmatter-ai/calendar';
 import { calculate, type ActivityInput, type LinkInput, type LinkType, type ScheduleInput } from '../src/index.js';
 import { at, DAY, STD } from './helpers.js';
 

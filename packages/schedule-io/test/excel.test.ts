@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { strToU8, zipSync } from 'fflate';
-import { defaultTenantCalendar, formatLocal, parseLocal } from '@nm/calendar';
-import { calculate } from '@nm/schedule-engine';
-import { evenKeys, toScheduleInput, type ActivityRecord, type LinkRecord, type ScheduleDoc } from '@nm/schedule-commands';
+import { defaultTenantCalendar, formatLocal, parseLocal } from '@northmatter-ai/calendar';
+import { calculate } from '@northmatter-ai/schedule-engine';
+import { evenKeys, toScheduleInput, type ActivityRecord, type LinkRecord, type ScheduleDoc } from '@northmatter-ai/schedule-commands';
 import {
   EXCEL_COLUMNS,
   excelTemplate,
@@ -35,7 +35,7 @@ function fixtureDoc(): ScheduleDoc {
     mk('TA', { type: 'summary', duration: 0, name: 'Tower A & co <main>' }),
     mk('EXC', { parentId: 'TA', duration: 5 * D, towerId: 'T1', actualStart: at('2026-11-23T09:00'), actualFinish: at('2026-11-28T18:00') }),
     mk('RAFT', { parentId: 'TA', duration: 4 * D, towerId: 'T1', actualStart: at('2026-11-30T09:00'), percentComplete: 4050, remaining: 3 * D }),
-    mk('COL', { parentId: 'TA', duration: 3 * D, towerId: 'T1', floorId: 'F01', calendarId: 'office' }),
+    mk('COL', { parentId: 'TA', duration: 3 * D, towerId: 'T1', floorId: 'F01', calendarId: 'office', activityTemplateId: 'COLS' }),
     mk('SLAB', { parentId: 'TA', duration: 2.5 * D, towerId: 'T1', floorId: 'F01', constraint: 'SNET', constraintDate: at('2026-12-14T09:00') }),
     mk('LOE', { type: 'level_of_effort', duration: 0, name: 'Supervision' }),
     mk('HO', { type: 'finish_milestone', duration: 0, constraint: 'FNLT', constraintDate: at('2027-01-30T18:00'), name: 'हस्तांतरण' }),
@@ -54,7 +54,7 @@ function fixtureDoc(): ScheduleDoc {
   return {
     id: 'fx', name: 'Fixture tower', kind: 'draft', version: 3, projectStart: at('2026-11-23T09:00'), dataDate: at('2026-12-02T09:00'),
     defaultCalendarId: 'site', calendars: [site, office], activities: acts, links, settings: {},
-    towers: { T1: 'Tower A' }, floors: { F01: 'Floor 1' },
+    towers: { T1: 'Tower A' }, floors: { F01: 'Floor 1' }, templates: [{ id: 'COLS', name: 'Columns & shear walls', short: 'Columns' }],
   };
 }
 
@@ -105,7 +105,7 @@ describe('Excel export → import round trip', () => {
   const doc = fixtureDoc();
   const res = calculate(toScheduleInput(doc));
   // Calendars are tenant-wide: the Calendar column names one the importing tenant already has.
-  const back = importExcel(exportExcel(doc, res), { calendars: doc.calendars, defaultCalendarId: 'site' });
+  const back = importExcel(exportExcel(doc, res), { calendars: doc.calendars, defaultCalendarId: 'site', templates: doc.templates! });
 
   it('keeps project settings from the Project sheet', () => {
     expect(back.doc.name).toBe('Fixture tower');
@@ -133,6 +133,8 @@ describe('Excel export → import round trip', () => {
       expect(b.towerId ? back.doc.towers![b.towerId] : undefined).toBe(a.towerId ? doc.towers![a.towerId] : undefined);
       expect(b.floorId ? back.doc.floors![b.floorId] : undefined).toBe(a.floorId ? doc.floors![a.floorId] : undefined);
     }
+    expect(byCode.get('COL')!.activityTemplateId).toBe('COLS'); // matched to the tenant's trade by name
+    expect(byCode.get('RAFT')!.activityTemplateId).toBeUndefined();
     expect(byCode.get('RAFT')!.percentComplete).toBe(4050); // 40.5%, stored in hundredths
     expect(byCode.get('RAFT')!.remaining).toBe(3 * D);
     expect(byCode.get('COL')!.remaining).toBeUndefined();
@@ -286,6 +288,19 @@ describe('Excel import rules', () => {
     expect(report.conversions[0]).toMatch(/Calculated columns ignored.*Start/);
   });
 
+  it('matches trades by name, short name or id, and adds unknown ones to the project', () => {
+    const templates = [{ id: 'SLAB', name: 'Slab shuttering, rebar & pour', short: 'Slab' }, { id: 'BLK', name: 'Blockwork' }];
+    const { doc, report } = importExcelSheets(sheet([
+      { Code: 'A', Name: 'A', 'Duration (days)': 1, Trade: 'slab' },
+      { Code: 'B', Name: 'B', 'Duration (days)': 1, Trade: 'BLOCKWORK' },
+      { Code: 'C', Name: 'C', 'Duration (days)': 1, Trade: 'Waterproofing' },
+      { Code: 'D', Name: 'D', 'Duration (days)': 1, Trade: 'waterproofing' },
+    ], ['Trade']), { ...opts, templates });
+    expect(doc.activities.map((a) => a.activityTemplateId)).toEqual(['SLAB', 'BLK', 'TR-WATERPROOFING', 'TR-WATERPROOFING']);
+    expect(doc.templates!.map((x) => x.name)).toEqual(['Slab shuttering, rebar & pour', 'Blockwork', 'Waterproofing']);
+    expect(report.conversions.filter((c) => c.includes('Waterproofing'))).toEqual(['Trade "Waterproofing" is new; added to the project\'s trades']);
+  });
+
   it('uses a named calendar and reports unknown ones', () => {
     const cals = [defaultTenantCalendar('site'), { id: 'office', name: 'Office (Mon–Fri)', baseId: 'site', timeZone: TZ, hoursPerDay: 420, week: { 6: [] as [number, number][] } }];
     const { doc, report } = importExcelSheets(sheet([
@@ -346,5 +361,6 @@ describe('Excel template', () => {
     expect(doc.links).toHaveLength(4);
     expect(local(doc.projectStart)).toBe('2026-12-01T09:00');
     expect(doc.activities.find((a) => a.code === 'TA')!.type).toBe('summary');
+    expect(doc.activities.find((a) => a.code === 'TA-F01-SLAB')).toMatchObject({ activityTemplateId: 'TR-SLAB' });
   });
 });

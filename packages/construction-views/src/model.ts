@@ -2,9 +2,9 @@
  * Pure data for the construction views (spec: "Construction views"). No React here, so it is
  * testable and the same derivations can run on the server for reports.
  */
-import type { Minutes } from '@nm/calendar';
-import type { ActivityResult, ScheduleResult } from '@nm/schedule-engine';
-import type { ActivityRecord, BaselineView, ScheduleDoc } from '@nm/schedule-commands';
+import type { Minutes } from '@northmatter-ai/calendar';
+import type { ActivityResult, ScheduleResult } from '@northmatter-ai/schedule-engine';
+import type { ActivityRecord, BaselineView, ScheduleDoc } from '@northmatter-ai/schedule-commands';
 
 // ------------------------------------------------------------------ Site inputs
 

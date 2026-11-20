@@ -66,6 +66,15 @@ Open the app on a phone on the same network (see "Dev server reachable from othe
 
 Phones are view-only, as the spec requires.
 
+### Towers, floors and trades (for the Tower × floor grid)
+
+The Tower × floor grid, line of balance and phone tower view show an activity only once it has a **tower**, a **floor** and a **trade** (the repeating work type: columns, slab, blockwork…).
+- **One activity at a time:** double-click it, then on the General tab pick a Tower, Floor and Trade. Choose **+ Add tower…** (or floor, or trade) to type a new one. It's added to the project when you save.
+- **The whole list:** **Towers, floors & trades…** in the toolbar lets you add towers, add floors in a range ("from 1 to 12"), rename, put floors and trades in order, and remove entries no activity uses.
+- **From Excel:** fill the Tower, Floor and optional **Trade** columns.
+
+Projects made with **+ New project → Tower schedule** come with all three already set.
+
 ### Changing dates on the chart
 
 - **Drag a bar** to move it. This sets a "start no earlier than" date, as MS Project does.
@@ -82,7 +91,7 @@ Phones are view-only, as the spec requires.
 | `pnpm dev` | Development server with hot reload | http://localhost:3600 |
 | `pnpm preview` | Production build, then serves it (closest to what users get) | http://localhost:3600 |
 | `pnpm build` | Production build only, into `apps/demo/dist/` (static files; host on any web server) | — |
-| `pnpm --filter @nm/gantt-demo exec vite --port 3600 --host` | Dev server reachable from other devices on your network (e.g. to try it on a phone or tablet) | http://\<your-ip\>:3600 |
+| `pnpm --filter @northmatter-ai/gantt-demo exec vite --port 3600 --host` | Dev server reachable from other devices on your network (e.g. to try it on a phone or tablet) | http://\<your-ip\>:3600 |
 
 ## 4. Run the checks
 
@@ -110,7 +119,7 @@ SHOT_DIR=/tmp/shots pnpm e2e
 
 | Problem | Fix |
 |---|---|
-| `Port 3600 is in use` | Something else is on 3600, perhaps another `pnpm dev`. Stop it, or run `pnpm --filter @nm/gantt-demo exec vite --port 3601`. |
+| `Port 3600 is in use` | Something else is on 3600, perhaps another `pnpm dev`. Stop it, or run `pnpm --filter @northmatter-ai/gantt-demo exec vite --port 3601`. |
 | `ERR_PNPM_IGNORED_BUILDS … esbuild` | You're on an older pnpm that ignores `allowBuilds`. Run `corepack enable`, then reinstall. Or run `pnpm approve-builds` and approve esbuild. |
 | `Unsupported engine` / syntax errors on start | Node is older than 22. Run `nvm use 22` (or install Node 22+). |
 | The sample looks wrong or old after code changes | Edits persist in `localStorage`. Click **Reset** in the toolbar, or run `localStorage.clear()` in the browser console and reload. |

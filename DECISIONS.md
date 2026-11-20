@@ -174,3 +174,35 @@ A cell can hold an Excel date, `2026-12-01`, `01/12/2026` or `1-Dec-2026`, with 
 - **Identity cues:** critical and late are marked with an icon and text, not colour alone.
 - **Layout:** the demo switches to this view below 700 px wide, or with `?view=phone`.
 *Tests:* `gantt/test/phone.test.ts`, e2e `phone.spec.ts`.
+
+## Towers, floors and trades
+
+### D-032 A 13th command: `updateLookups`
+The spec lists 12 commands, and none of them can create a tower, floor or trade. So a project that didn't start from the tower template could never reach the tower × floor grid. `updateLookups` changes the lists that activities point at:
+- `towers` and `floors` (id → name; null removes);
+- `floorOrder` (bottom to top);
+- `templates` (trades in construction order).
+
+Rules:
+- Names are trimmed, must not be empty, and must be unique ignoring case.
+- An entry an activity still uses cannot be removed (`IN_USE`).
+- The inverse restores exactly the previous lists, so one undo reverses an editor save that added a tower and tagged the activity.
+- `updateActivity` now refuses tower, floor or trade ids the project doesn't have (`UNKNOWN_TOWER`, `UNKNOWN_FLOOR`, `UNKNOWN_TRADE`).
+- New ids are readable and unique (`lookupId`: `T-TOWER-A`, `F-FLOOR-3`, `TR-WATERPROOFING`).
+
+The Planning API needs the same command when it is built.
+*Tests:* `commands.test.ts › updateLookups…`, `gantt/test/setup.test.ts`, e2e `lookups.spec.ts`.
+
+### D-033 Excel Trade column
+**Trade** is an optional column after the template, as Remaining is (D-028), since the spec's template has no trade.
+- **Import:** the column matches the importing tenant's trades by name, short name or id, ignoring case. An unknown trade is added to the project and listed in the report.
+- **Export:** the column is written whenever an activity has a trade.
+*Tests:* `excel.test.ts › matches trades…`, round trip.
+
+### D-034 Publishing to npm
+The six packages are published as public, MIT-licensed packages under `@northmatter-ai` (it was `@nm`, which we don't own on npm). They release together at one version. See [RELEASING.md](RELEASING.md).
+- **Build:** plain `tsc` emit to `dist` (ESM + `.d.ts` + source maps, with `src` shipped for the maps), with no bundler. The worker keeps the `new URL('./engine.worker.js', import.meta.url)` form, which every major bundler understands. The build only rewrites `.ts` → `.js` in that URL.
+- **Dev vs published:** `exports` stays on `src` for the workspace. `publishConfig.exports` points at `dist` for the tarball. Sibling packages resolve to each other's `dist` types at build time (`paths` in `tsconfig.build.json`), so no package re-emits another's sources.
+- **No Changesets:** its dev dependencies (`argparse` Python-2.0, `graceful-fs` BlueOak-1.0.0, `spawndamnit` unlicensed) fail the licence allow-list. A small `set-version` script and a `v*` tag trigger do the same job here.
+- **CI publish:** uses npm trusted publishing (OIDC) with provenance, so no npm token is stored. The first publish has to be by hand, because npm can only register a trusted publisher on a package that already exists.
+- **Checked by:** `scripts/check-packages.mjs` (tarball contents), and a throwaway Vite + React app installed from the tarballs. That app type-checks with `skipLibCheck: false`, renders the Gantt, starts the engine worker from the published `.js`, and runs both exporters with no console errors.

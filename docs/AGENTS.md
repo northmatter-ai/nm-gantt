@@ -11,9 +11,9 @@ Read this before changing anything. It says what exists, where it lives, the rul
 | **Licences** | Dependencies must be MIT, Apache-2.0, BSD-2/3-Clause or ISC. `node scripts/check-licenses.mjs` enforces this. An SPDX `OR` passes if any branch is allowed. The only exception is `caniuse-lite`, a dev-only tool listed in `scripts/license-exceptions.json`, and it still awaits sign-off (D-012). Check a new dependency's **whole tree** before adding it; that is why ExcelJS was rejected (D-028). |
 | **Clean room** | Never copy or port code from commercial Gantt products (Bryntum, DHTMLX, …) or from GPL code. Write from public specs (ECMA-376, the MSPDI schema) and from the build spec. |
 | **TypeScript strict** | All 7 packages. `pnpm typecheck` must pass. |
-| **Pure engine** | `@nm/calendar` and `@nm/schedule-engine` have no I/O and no runtime dependencies, and use no `Date.now()`. All times are **integer minutes**, and ties are broken by id, so results are deterministic. |
+| **Pure engine** | `@northmatter-ai/calendar` and `@northmatter-ai/schedule-engine` have no I/O and no runtime dependencies, and use no `Date.now()`. All times are **integer minutes**, and ties are broken by id, so results are deterministic. |
 | **Every rule has a test** | A behaviour you add or change needs a unit test named after the rule. Anything visible in the UI also needs a Playwright test. |
-| **Interpretations go in DECISIONS.md** | The next free number is **D-032**. Each entry names the test that pins it. |
+| **Interpretations go in DECISIONS.md** | The next free number is **D-034**. Each entry names the test that pins it. |
 | **Git** | The folder is **not a git repository** yet. Don't commit unless the user asks. |
 
 ## 2. Repository map
@@ -35,13 +35,13 @@ The dependencies run one way: `calendar` ← `schedule-engine` ← `schedule-com
 
 ## 3. What is built, package by package
 
-### `@nm/calendar` (M1, done)
+### `@northmatter-ai/calendar` (M1, done)
 - `src/calendar.ts` provides `compileCalendar(s)`, `nextWorkStart`, `prevWorkEnd`, `finishFrom`, `startFrom`, `workBetween`, `shift`, `ELAPSED` and `defaultTenantCalendar(id, holidays)` (Mon–Sat, 8 h, Asia/Kolkata).
 - `src/dates.ts` and `src/zone.ts` handle local dates via `Intl` with per-day offset caching (D-001). Helpers: `parseLocal(tz, 'YYYY-MM-DDTHH:MM')`, `formatLocal`, `instantToLocal`, `dayStartInstant`, `isoToDay`/`dayToIso` (days since 1970-01-01), `weekdayOfDay` (0 = Sunday) and `instantFromEpochMs`.
 - Calendars support inheritance (`baseId`), exceptions and IANA zones.
 - Tests: 54, including the performance target (100k `finishFrom` in under 150 ms, best of 3 runs).
 
-### `@nm/schedule-engine` (M2–M4, done in code but not yet verified against MS Project)
+### `@northmatter-ai/schedule-engine` (M2–M4, done in code but not yet verified against MS Project)
 - `calculate(input) → ScheduleResult` **never throws**. On a bad schedule it returns `ok: false` with `errors`.
 - It covers:
   - validation (Tarjan cycle detection), Kahn ordering, and the forward and backward passes;
@@ -53,34 +53,38 @@ The dependencies run one way: `calendar` ← `schedule-engine` ← `schedule-com
 - `ActivityResult` fields: `es ef ls lf totalFloat freeFloat isCritical isLongestPath drivingLinkIds drivingPredecessorIds remainingStart? remaining? status`.
 - Tests: 48 unit and 8 property tests (spec properties 1–7). 10k activities and 20k links calculate in under 500 ms.
 
-### `@nm/schedule-commands`
+### `@northmatter-ai/schedule-commands`
 - `model.ts`:
   - `ScheduleDoc`: id, name, kind, version, projectStart, dataDate, defaultCalendarId, calendars, activities, links, settings, towers?, floors?, floorOrder?, templates?.
   - `ActivityRecord`: adds stableKey, code, name, sortKey, tower/floor ids, notes, externalRef and `autoSummary?` (D-027).
   - `ScheduleVersionView { doc, results?, baselines? }`, `BaselineView`, and `toScheduleInput(doc)`.
-- `commands.ts` holds the **12 commands**: `addActivity`, `updateActivity`, `deleteActivity`, `moveActivity`, `indent`, `outdent`, `addLink`, `updateLink`, `deleteLink`, `setConstraint`, `setCalendar`, `setProgress`.
+- `commands.ts` holds the spec's **12 commands**: `addActivity`, `updateActivity`, `deleteActivity`, `moveActivity`, `indent`, `outdent`, `addLink`, `updateLink`, `deleteLink`, `setConstraint`, `setCalendar`, `setProgress`.
+  - It also holds a 13th, **`updateLookups`**, for the tower, floor and trade lists (D-032), plus `lookupId` for new ids.
+  - `updateActivity` refuses tower, floor or trade ids the project doesn't have.
   - `applyCommands(doc, cmds)` is all-or-nothing and returns `{ doc, inverse }`, which drives undo/redo.
-  - It throws `CommandError` with codes such as `LINK_TO_SUMMARY`, `CYCLE`, `HAS_LINKS` and `PARENT_NOT_SUMMARY`.
+  - It throws `CommandError` with codes such as `LINK_TO_SUMMARY`, `CYCLE`, `HAS_LINKS`, `PARENT_NOT_SUMMARY`, `IN_USE` and `UNKNOWN_TOWER`.
 - `sortKey.ts` has fractional sibling keys (`keyBetween`, `evenKeys`, `keysAfter`).
 - `text.ts` has `parseDuration`/`formatDuration` ("5d", "4h", "2w") and `parsePredecessors`/`formatPredecessor` ("12FS+2d; 15SS").
 
-### `@nm/schedule-io` (M5, partly done)
+### `@northmatter-ai/schedule-io` (M5, partly done)
 - `mspdi.ts`: `importMspdi(xml, opts) → { doc, result, report }` and `exportMspdi(doc, result)`. The report has `unmapped`, `conversions`, `errors`, `warnings` and `counts`, and **is** the dry run. Codes still to verify against the schema are listed in D-017.
 - `excel.ts`:
   - **Import:** `importExcel(bytes, { calendars, defaultCalendarId, projectStart, … })`, plus `importExcelSheets` (pure, used by the tests).
   - **Export:** `exportExcel(doc, result)` and `excelTemplate()`.
-  - **Template:** the spec's **14 columns**, plus an optional `Remaining (days)` column, an optional `Project` sheet, and calculated columns that import ignores (D-028 to D-030).
+  - **Template:** the spec's **14 columns**, plus optional `Trade` and `Remaining (days)` columns, an optional `Project` sheet, and calculated columns that import ignores (D-028 to D-030, D-033).
 - `xlsx.ts` is our own minimal .xlsx reader/writer on `fflate` and `fast-xml-parser`. **Do not swap in ExcelJS or SheetJS**; see D-028.
 - `links.ts` holds `resolveLinks`, the spec's rule for links to summaries, shared by both formats.
 - Tests: 7 MSPDI and 23 Excel. Generated files were checked with openpyxl but **not yet in real Excel**.
 
-### `@nm/gantt` (M6–M7, done)
+### `@northmatter-ai/gantt` (M6–M7, done)
 - **`Gantt.tsx`:** `<Gantt version mode="edit|view|print" zoom groupBy filter showBaselineId onCommands …/>`.
   - The component holds no business rules. Each user action becomes `Command[]`, the engine previews it in a Web Worker (`engine.worker.ts`, `usePreview.ts`), and then `onCommands` sends it. The server's result always wins.
-  - `GanttHandle`: `undo`, `redo`, `canUndo`, `canRedo`, `scrollToDate`, `addActivity`, `expandAll`, `collapseAll` and `focusActivity`.
+  - `GanttHandle`: `undo`, `redo`, `canUndo`, `canRedo`, `scrollToDate`, `addActivity`, `expandAll`, `collapseAll`, `focusActivity` and `openSetup`.
+  - **Undo history** can be owned by the host: pass `history={createUndoHistory()}` and keep the object. The demo keeps one per open project, so undo survives tab switches. Without the prop, history lives and dies with the component.
 - **Interactions:**
   - **Dragging:** move a bar (sets SNET), drag either end (left = SNET + duration, right = duration, or remaining if started), drag a summary (moves its not-started children), drag a progress handle, draw a link from bar end to bar end, and reorder rows by dragging. Rules: D-016 and D-026.
   - **Editing:** grid cells, including Start and Finish (D-015, D-019); a double-click opens the editor (`ActivityEditor.tsx`).
+  - **Tower, floor and trade:** the editor's pickers have "+ Add…" entries. `ProjectSetup.tsx` (the "Towers, floors & trades" dialog) adds, renames, orders and removes them in one undoable command.
   - **Keyboard and menus:** Tab/Shift+Tab indent (D-014, D-027), Ins/Del, a context menu, trace back/forward, and undo/redo of 100 steps.
 - **Display and access:**
   - virtualised grid via `@tanstack/react-virtual`, with zoom from day to year and Ctrl+wheel;
@@ -89,9 +93,9 @@ The dependencies run one way: `calendar` ← `schedule-engine` ← `schedule-com
 - **`Phone.tsx` and `phoneModel.ts`:** `<PhoneSchedule version initialScope showBaselineId locale/>`.
   - A read-only list with bars, scoped to a 2–6 week look-ahead, one tower, or the whole project.
   - Pinch, swipe, −/+/Fit, and tap for a details sheet (D-031). `buildPhoneList` is pure.
-- Tests: 12 helper and 8 phone tests. The 5,000-activity schedule renders in about 125 ms headless.
+- Tests: 12 helper, 8 phone and 3 setup tests. The 5,000-activity schedule renders in about 125 ms headless.
 
-### `@nm/construction-views` (M8, partly done)
+### `@northmatter-ai/construction-views` (M8, partly done)
 - `TowerFloorGrid`, `LineOfBalance`, `LookAhead` (with PPC and browser print-to-PDF) and `ActivityDetails`.
 - The models live in `model.ts`: `SiteData`, `cellState`, `buildTowerGrid`, `buildLob` and `buildLookahead`. Rules: D-020 to D-025.
 - They run on **mock Site data** (`apps/demo/src/siteMock.ts`). The `SiteData` shape still needs confirming with the Site team.
@@ -111,7 +115,7 @@ The dependencies run one way: `calendar` ← `schedule-engine` ← `schedule-com
   - `largeSchedule()` builds 5,000 activities; `stressTower(40, 30)` builds the tower stress test; `blankProject`.
   - `withProgress` adds progress up to a data date.
   - `calendars()` returns `site` and `office`.
-- **e2e (Playwright, 32 tests):** `gantt` (12), `drag` (8), `phone` (6), `construction` (4), `projects` (3), `excel` (3). They build and serve on port 3612.
+- **e2e (Playwright, 35 tests):** `gantt` (12), `drag` (8), `phone` (6), `construction` (4), `projects` (3), `excel` (3), `lookups` (3). They build and serve on port 3612.
 
 ## 4. Data conventions that catch people out
 
@@ -121,6 +125,7 @@ The dependencies run one way: `calendar` ← `schedule-engine` ← `schedule-com
 - **Finish times:** a finish is the end of the last working minute. `prevWorkEnd(Tue 09:00)` is `Mon 18:00` (D-002).
 - **Summaries** carry no links. Their dates come from their children, and an empty summary sits at the project start (D-009).
 - **Codes and ids:** `code` is what users see and what predecessor text refers to. `stableKey` matches activities to baselines across versions.
+- **The tower × floor grid** shows an activity only if it has all three of `towerId`, `floorId` and `activityTemplateId` (its trade), and each must exist in `doc.towers`, `doc.floors` and `doc.templates`.
 - **Excel dates** cross the boundary as JS `Date`s whose **UTC fields** hold the wall-clock values.
 
 ## 5. Running and checking
@@ -129,10 +134,10 @@ The dependencies run one way: `calendar` ← `schedule-engine` ← `schedule-com
 pnpm install          # pnpm 12.21.0 via corepack, Node 22+
 pnpm dev              # demo at http://localhost:3600
 pnpm typecheck        # all 7 packages
-pnpm test             # Vitest: 183 tests
+pnpm test             # Vitest: 189 tests
 pnpm run licenses     # licence gate; plain "pnpm licenses" is pnpm's own command
 pnpm run ci           # all four in order
-pnpm e2e              # Playwright: 32 tests; first time: pnpm exec playwright install chromium
+pnpm e2e              # Playwright: 35 tests; first time: pnpm exec playwright install chromium
 SHOT_DIR=/some/dir pnpm e2e       # also saves screenshots
 ```
 

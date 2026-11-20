@@ -1,4 +1,4 @@
-/* @nm/gantt — colours come from CSS variables; light and dark themes; tenant brand via --nm-brand. */
+/* @northmatter-ai/gantt — colours come from CSS variables; light and dark themes; tenant brand via --nm-brand. */
 .nm-gantt {
   --nm-brand: #2f6fde;
   --nm-bg: #ffffff;
@@ -276,3 +276,24 @@
 .nm-ph-pct i { position: absolute; inset: 0 auto 0 0; background: var(--nm-bar); }
 .nm-ph-pct span { position: relative; display: block; text-align: center; line-height: 22px; font-size: 12px; font-weight: 600; }
 .nm-ph-ro { margin: 16px 0 0; color: var(--nm-fg-muted); font-size: 12px; text-align: center; }
+
+/* ---------------- tower / floor / trade pickers and project setup */
+.nm-lookup { display: flex; gap: 6px; min-width: 0; }
+.nm-lookup select { flex: 1 1 50%; min-width: 0; }
+.nm-lookup input { flex: 1 1 50%; min-width: 0; }
+.nm-form-hint { margin: 0; color: var(--nm-fg-muted); font-size: 12px; }
+.nm-setup { width: min(720px, 100%); }
+.nm-setup-sec { margin-top: 14px; }
+.nm-setup-sec h3 { margin: 0 0 6px; font-size: 13px; }
+.nm-setup-list { margin: 0; padding: 0 0 0 22px; display: grid; gap: 4px; max-height: 220px; overflow: auto; }
+.nm-setup-list li { display: flex; align-items: center; gap: 6px; }
+.nm-setup-list li::marker { color: var(--nm-fg-muted); font-size: 11px; }
+.nm-setup-list input, .nm-setup-range input { font: inherit; color: var(--nm-fg); background: var(--nm-bg); border: 1px solid var(--nm-border); border-radius: 5px; padding: 4px 8px; min-width: 0; }
+.nm-setup-list input:first-child { flex: 1; }
+.nm-setup-list .nm-setup-short { width: 110px; flex: none; }
+.nm-setup-used { width: 92px; flex: none; color: var(--nm-fg-muted); font-size: 12px; text-align: right; }
+.nm-setup-icon { flex: none; width: 28px; height: 28px; border: 1px solid var(--nm-border); border-radius: 5px; background: var(--nm-bg); color: var(--nm-fg); cursor: pointer; }
+.nm-setup-icon:disabled { opacity: 0.35; cursor: default; }
+.nm-setup-add { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: 8px; }
+.nm-setup-range { display: inline-flex; align-items: center; gap: 6px; color: var(--nm-fg-muted); }
+.nm-setup-range input { width: 56px; }

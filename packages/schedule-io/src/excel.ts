@@ -16,17 +16,18 @@ import {
   type CalendarInput,
   type CompiledCalendar,
   type Minutes,
-} from '@nm/calendar';
-import { calculate, type ActivityType, type ConstraintType, type ScheduleResult } from '@nm/schedule-engine';
+} from '@northmatter-ai/calendar';
+import { calculate, type ActivityType, type ConstraintType, type ScheduleResult } from '@northmatter-ai/schedule-engine';
 import {
   evenKeys,
   formatDuration,
+  lookupId,
   parseDuration,
   parsePredecessors,
   toScheduleInput,
   type ActivityRecord,
   type ScheduleDoc,
-} from '@nm/schedule-commands';
+} from '@northmatter-ai/schedule-commands';
 import { resolveLinks, type PendingLink } from './links.js';
 import type { ImportReport, ImportResult } from './mspdi.js';
 import { readXlsx, writeXlsx, type CellValue, type SheetData, type WriteSheet } from './xlsx.js';
@@ -36,13 +37,16 @@ export const EXCEL_COLUMNS = [
   'WBS', 'Code', 'Name', 'Type', 'Duration (days)', 'Calendar', 'Predecessors', 'Constraint', 'Constraint date',
   'Tower', 'Floor', 'Actual start', 'Actual finish', '% complete',
 ] as const;
-type Col = (typeof EXCEL_COLUMNS)[number] | typeof EXCEL_REMAINING_COLUMN;
+type Col = (typeof EXCEL_COLUMNS)[number] | typeof EXCEL_REMAINING_COLUMN | typeof EXCEL_TRADE_COLUMN;
 
 /**
  * Optional column after the template: remaining working days of in-progress work. Written on export only where an
  * activity has an explicit remaining duration, so a round trip keeps the same forecast (D-028).
  */
 export const EXCEL_REMAINING_COLUMN = 'Remaining (days)';
+
+/** Optional column after the template: the trade (activity template) that puts an activity on the tower × floor grid (D-033). */
+export const EXCEL_TRADE_COLUMN = 'Trade';
 
 /** Written after the template on export so the sheet is useful to read; ignored on import. */
 export const EXCEL_CALCULATED_COLUMNS = ['Start (calculated)', 'Finish (calculated)', 'Total float (days)', 'Critical'] as const;
@@ -72,6 +76,7 @@ const HEADER_ALIASES: Record<string, Col> = {
   tower: 'Tower', block: 'Tower',
   floor: 'Floor', level: 'Floor',
   actualstart: 'Actual start', actualfinish: 'Actual finish',
+  trade: EXCEL_TRADE_COLUMN, worktype: EXCEL_TRADE_COLUMN, activitytemplate: EXCEL_TRADE_COLUMN, template: EXCEL_TRADE_COLUMN,
   remainingdays: EXCEL_REMAINING_COLUMN, remaining: EXCEL_REMAINING_COLUMN, remainingduration: EXCEL_REMAINING_COLUMN,
   '%complete': '% complete', complete: '% complete', percentcomplete: '% complete', pctcomplete: '% complete', progress: '% complete',
 };
@@ -92,6 +97,8 @@ export interface ExcelImportOptions {
   projectStart?: Minutes;
   /** Used when the workbook has no Project sheet data date. Default: the project start. */
   dataDate?: Minutes;
+  /** The tenant's trades; the Trade column matches their name, short name or id. Unknown trades are added. */
+  templates?: { id: string; name: string; short?: string }[];
 }
 
 // ------------------------------------------------------------------ dates
@@ -221,6 +228,9 @@ export function importExcelSheets(sheets: SheetData[], options: ExcelImportOptio
   const drafts: Draft[] = [];
   const codes = new Map<string, Draft>();
   const wbsMap = new Map<string, Draft>();
+  const templates = (options.templates ?? []).map((x) => ({ ...x }));
+  const tradeByKey = new Map<string, string>();
+  for (const x of templates) for (const k of [x.id, x.name, x.short]) if (k) tradeByKey.set(norm(k), x.id);
   const towers: Record<string, string> = {};
   const floors: Record<string, string> = {};
   const floorOrder: string[] = [];
@@ -319,6 +329,18 @@ export function importExcelSheets(sheets: SheetData[], options: ExcelImportOptio
       const rem = typeof remCell === 'number' ? Math.round(remCell * hpd) : parseDuration(cellText(remCell), hpd);
       if (rem === null || rem < 0) report.unmapped.push(`Row ${line} (${code}): remaining "${cellText(remCell)}" not understood; skipped`);
       else a.remaining = rem;
+    }
+
+    const tradeText = cellText(at(row, EXCEL_TRADE_COLUMN));
+    if (tradeText) {
+      let tid = tradeByKey.get(norm(tradeText));
+      if (!tid) {
+        tid = lookupId('TR', tradeText, templates.map((x) => x.id));
+        templates.push({ id: tid, name: tradeText });
+        tradeByKey.set(norm(tradeText), tid);
+        report.conversions.push(`Trade "${tradeText}" is new; added to the project's trades`);
+      }
+      a.activityTemplateId = tid;
     }
 
     const towerText = cellText(at(row, 'Tower'));
@@ -424,6 +446,7 @@ export function importExcelSheets(sheets: SheetData[], options: ExcelImportOptio
     settings: {},
     ...(Object.keys(towers).length ? { towers } : {}),
     ...(Object.keys(floors).length ? { floors, floorOrder } : {}),
+    ...(templates.length ? { templates } : {}),
   };
   report.counts.calendars = calendars.length;
   const result = calculate(toScheduleInput(doc));
@@ -485,6 +508,7 @@ function instructionsSheet(): WriteSheet {
     ['Actual start', 'Date work actually started.', ''],
     ['Actual finish', 'Date work actually finished.', ''],
     ['% complete', '0 to 100.', '40'],
+    ['Trade', 'Optional, after the template: the repeating work type (Columns, Slab, Blockwork…). With Tower and Floor it puts the activity on the tower × floor grid. New names are added to the project.', 'Slab'],
     ['Remaining (days)', 'Optional, after the template: working days left on started work. Blank = worked out from % complete.', '3'],
     [],
     ['Dates', 'Excel dates, 2026-12-01, 01/12/2026 (day first) or 1-Dec-2026. Add a time (09:00) only if it matters.', ''],
@@ -508,7 +532,9 @@ export function exportExcel(doc: ScheduleDoc, result?: ScheduleResult): Uint8Arr
     predsOf.set(l.to, [...(predsOf.get(l.to) ?? []), predText(from.code, l.type, l.lag, hpdOf(byId.get(l.to)?.calendarId))]);
   }
   const withRemaining = doc.activities.some((a) => a.remaining !== undefined && a.actualFinish === undefined);
-  const header: CellValue[] = [...EXCEL_COLUMNS, ...(withRemaining ? [EXCEL_REMAINING_COLUMN] : []), ...EXCEL_CALCULATED_COLUMNS];
+  const withTrade = doc.activities.some((a) => a.activityTemplateId);
+  const tradeName = (id: string | undefined) => (id ? doc.templates?.find((x) => x.id === id)?.name ?? id : '');
+  const header: CellValue[] = [...EXCEL_COLUMNS, ...(withTrade ? [EXCEL_TRADE_COLUMN] : []), ...(withRemaining ? [EXCEL_REMAINING_COLUMN] : []), ...EXCEL_CALCULATED_COLUMNS];
   const rows: CellValue[][] = [header];
   for (const a of order) {
     const r = result?.activities[a.id];
@@ -530,6 +556,7 @@ export function exportExcel(doc: ScheduleDoc, result?: ScheduleResult): Uint8Arr
       a.actualStart !== undefined ? excelDate(tz, a.actualStart) : null,
       a.actualFinish !== undefined ? excelDate(tz, a.actualFinish) : null,
       a.percentComplete !== undefined ? a.percentComplete / 100 : a.actualFinish !== undefined ? 100 : null,
+      ...(withTrade ? [tradeName(a.activityTemplateId)] : []),
       ...(withRemaining ? [a.remaining !== undefined && a.actualFinish === undefined ? round2(a.remaining / hpd) : null] : []),
       start !== undefined ? excelDate(tz, start) : null,
       finish !== undefined ? excelDate(tz, finish) : null,
@@ -539,7 +566,7 @@ export function exportExcel(doc: ScheduleDoc, result?: ScheduleResult): Uint8Arr
   }
   const schedule: WriteSheet = {
     name: 'Schedule', rows, header: true,
-    widths: [8, 16, 40, 16, 14, 18, 30, 11, 15, 12, 10, 14, 14, 11, ...(withRemaining ? [16] : []), 17, 17, 17, 9],
+    widths: [8, 16, 40, 16, 14, 18, 30, 11, 15, 12, 10, 14, 14, 11, ...(withTrade ? [24] : []), ...(withRemaining ? [16] : []), 17, 17, 17, 9],
     lists: [
       { col: 3, options: Object.values(TYPE_LABEL).concat('Milestone') },
       { col: 7, options: ['ASAP', 'ALAP', 'SNET', 'SNLT', 'FNET', 'FNLT', 'MSO', 'MFO'] },
@@ -561,17 +588,17 @@ export function exportExcel(doc: ScheduleDoc, result?: ScheduleResult): Uint8Arr
 /** A blank template with a few example rows, for planners starting in Excel. */
 export function excelTemplate(projectStartIso?: string): Uint8Array {
   const rows: CellValue[][] = [
-    [...EXCEL_COLUMNS],
-    ['1', 'TA', 'Tower A', 'Summary', null, '', '', '', null, 'Tower A', '', null, null, null],
-    ['1.1', 'TA-MOB', 'Site mobilisation', 'Task', 10, '', '', '', null, 'Tower A', '', null, null, null],
-    ['1.2', 'TA-EXC', 'Excavation', 'Task', 12, '', 'TA-MOB', '', null, 'Tower A', '', null, null, null],
-    ['1.3', 'TA-RAFT', 'Raft foundation', 'Task', 8, '', 'TA-EXC FS+2d', '', null, 'Tower A', '', null, null, null],
-    ['1.4', 'TA-F01-SLAB', 'Floor 1 slab', 'Task', 5, '', 'TA-RAFT', '', null, 'Tower A', '1', null, null, null],
-    ['1.5', 'TA-HO', 'Tower A handover', 'Finish milestone', 0, '', 'TA-F01-SLAB', '', null, 'Tower A', '', null, null, null],
+    [...EXCEL_COLUMNS, EXCEL_TRADE_COLUMN],
+    ['1', 'TA', 'Tower A', 'Summary', null, '', '', '', null, 'Tower A', '', null, null, null, ''],
+    ['1.1', 'TA-MOB', 'Site mobilisation', 'Task', 10, '', '', '', null, 'Tower A', '', null, null, null, ''],
+    ['1.2', 'TA-EXC', 'Excavation', 'Task', 12, '', 'TA-MOB', '', null, 'Tower A', '', null, null, null, ''],
+    ['1.3', 'TA-RAFT', 'Raft foundation', 'Task', 8, '', 'TA-EXC FS+2d', '', null, 'Tower A', '', null, null, null, ''],
+    ['1.4', 'TA-F01-SLAB', 'Floor 1 slab', 'Task', 5, '', 'TA-RAFT', '', null, 'Tower A', '1', null, null, null, 'Slab'],
+    ['1.5', 'TA-HO', 'Tower A handover', 'Finish milestone', 0, '', 'TA-F01-SLAB', '', null, 'Tower A', '', null, null, null, ''],
   ];
   const start = projectStartIso ? new Date(`${projectStartIso}T00:00Z`) : null;
   return writeXlsx([
-    { name: 'Schedule', rows, header: true, widths: [8, 16, 40, 16, 14, 18, 30, 11, 15, 12, 10, 14, 14, 11],
+    { name: 'Schedule', rows, header: true, widths: [8, 16, 40, 16, 14, 18, 30, 11, 15, 12, 10, 14, 14, 11, 20],
       lists: [{ col: 3, options: Object.values(TYPE_LABEL).concat('Milestone') }, { col: 7, options: ['ASAP', 'ALAP', 'SNET', 'SNLT', 'FNET', 'FNLT', 'MSO', 'MFO'] }] },
     { name: PROJECT_SHEET, header: true, widths: [18, 30], rows: [['Field', 'Value'], [PROJECT_FIELDS.name, ''], [PROJECT_FIELDS.start, start], [PROJECT_FIELDS.dataDate, null], [PROJECT_FIELDS.timeZone, 'Asia/Kolkata']] },
     instructionsSheet(),

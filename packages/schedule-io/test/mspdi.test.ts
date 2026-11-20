@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import { defaultTenantCalendar, formatLocal, parseLocal } from '@nm/calendar';
-import { calculate } from '@nm/schedule-engine';
-import { toScheduleInput, type ScheduleDoc } from '@nm/schedule-commands';
+import { defaultTenantCalendar, formatLocal, parseLocal } from '@northmatter-ai/calendar';
+import { calculate } from '@northmatter-ai/schedule-engine';
+import { toScheduleInput, type ScheduleDoc } from '@northmatter-ai/schedule-commands';
 import { exportMspdi, importMspdi, parseIsoDuration } from '../src/index.js';
 
 const TZ = 'Asia/Kolkata';

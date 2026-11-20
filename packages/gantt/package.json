@@ -1,21 +1,69 @@
 {
-  "name": "@nm/gantt",
+  "name": "@northmatter-ai/gantt",
   "version": "0.1.0",
-  "private": true,
+  "description": "React Gantt chart with drag-and-stretch editing, live CPM preview in a Web Worker, and a phone view.",
+  "keywords": [
+    "gantt",
+    "react",
+    "scheduling",
+    "cpm",
+    "project-management"
+  ],
+  "license": "MIT",
+  "author": "NorthMatter AI",
+  "homepage": "https://github.com/northmatter-ai/nm-gantt/tree/main/packages/gantt#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/northmatter-ai/nm-gantt.git",
+    "directory": "packages/gantt"
+  },
+  "bugs": {
+    "url": "https://github.com/northmatter-ai/nm-gantt/issues"
+  },
   "type": "module",
-  "license": "UNLICENSED",
+  "sideEffects": [
+    "*.css"
+  ],
   "exports": {
     ".": "./src/index.ts",
     "./gantt.css": "./src/gantt.css"
   },
-  "scripts": { "typecheck": "tsc -p tsconfig.json" },
+  "files": [
+    "dist",
+    "src",
+    "!src/**/*.test.*",
+    "README.md",
+    "LICENSE"
+  ],
+  "publishConfig": {
+    "access": "public",
+    "exports": {
+      ".": {
+        "types": "./dist/index.d.ts",
+        "import": "./dist/index.js"
+      },
+      "./gantt.css": "./dist/gantt.css"
+    },
+    "main": "./dist/index.js",
+    "types": "./dist/index.d.ts"
+  },
+  "scripts": {
+    "build": "node ../../scripts/build-package.mjs",
+    "typecheck": "tsc -p tsconfig.json"
+  },
+  "engines": {
+    "node": ">=18"
+  },
   "dependencies": {
-    "@nm/calendar": "workspace:*",
-    "@nm/schedule-commands": "workspace:*",
-    "@nm/schedule-engine": "workspace:*",
+    "@northmatter-ai/calendar": "workspace:*",
+    "@northmatter-ai/schedule-commands": "workspace:*",
+    "@northmatter-ai/schedule-engine": "workspace:*",
     "@tanstack/react-virtual": "^3.11.2"
   },
-  "peerDependencies": { "react": "^18.3.0 || ^19.0.0", "react-dom": "^18.3.0 || ^19.0.0" },
+  "peerDependencies": {
+    "react": "^18.3.0 || ^19.0.0",
+    "react-dom": "^18.3.0 || ^19.0.0"
+  },
   "devDependencies": {
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",

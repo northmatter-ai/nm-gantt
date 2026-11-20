@@ -1,0 +1,13 @@
+{
+  // Used only by `pnpm build:packages`. Emits dist/*.js + .d.ts per package.
+  // Sibling packages resolve to their built dist (built first, in dependency order),
+  // so one package's build never re-emits another package's sources.
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "noEmit": false,
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "paths": { "@northmatter-ai/*": ["./packages/*/dist/index.d.ts"] }
+  }
+}

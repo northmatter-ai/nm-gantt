@@ -1,10 +1,57 @@
 {
-  "name": "@nm/schedule-engine",
+  "name": "@northmatter-ai/schedule-engine",
   "version": "0.1.0",
-  "private": true,
+  "description": "CPM scheduling engine: forward/backward pass, constraints, float and critical path, MS Project-compatible.",
+  "keywords": [
+    "scheduling",
+    "cpm",
+    "construction",
+    "northmatter"
+  ],
+  "license": "MIT",
+  "author": "NorthMatter AI",
+  "homepage": "https://github.com/northmatter-ai/nm-gantt/tree/main/packages/schedule-engine#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/northmatter-ai/nm-gantt.git",
+    "directory": "packages/schedule-engine"
+  },
+  "bugs": {
+    "url": "https://github.com/northmatter-ai/nm-gantt/issues"
+  },
   "type": "module",
-  "license": "UNLICENSED",
-  "exports": { ".": "./src/index.ts" },
-  "scripts": { "typecheck": "tsc -p tsconfig.json" },
-  "dependencies": { "@nm/calendar": "workspace:*" }
+  "sideEffects": [
+    "*.css"
+  ],
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "files": [
+    "dist",
+    "src",
+    "!src/**/*.test.*",
+    "README.md",
+    "LICENSE"
+  ],
+  "publishConfig": {
+    "access": "public",
+    "exports": {
+      ".": {
+        "types": "./dist/index.d.ts",
+        "import": "./dist/index.js"
+      }
+    },
+    "main": "./dist/index.js",
+    "types": "./dist/index.d.ts"
+  },
+  "scripts": {
+    "build": "node ../../scripts/build-package.mjs",
+    "typecheck": "tsc -p tsconfig.json"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "@northmatter-ai/calendar": "workspace:*"
+  }
 }

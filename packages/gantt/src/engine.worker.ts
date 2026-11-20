@@ -1,5 +1,5 @@
 /// <reference lib="webworker" />
-import { calculate, type ScheduleInput } from '@nm/schedule-engine';
+import { calculate, type ScheduleInput } from '@northmatter-ai/schedule-engine';
 
 declare const self: DedicatedWorkerGlobalScope;
 

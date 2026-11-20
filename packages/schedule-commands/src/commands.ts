@@ -3,8 +3,8 @@
  * list drives undo/redo, the audit log and the server. Applying a command returns the new
  * document and the inverse commands that undo it.
  */
-import type { Minutes } from '@nm/calendar';
-import type { ConstraintType } from '@nm/schedule-engine';
+import type { Minutes } from '@northmatter-ai/calendar';
+import type { ConstraintType } from '@northmatter-ai/schedule-engine';
 import type { ActivityRecord, LinkRecord, ScheduleDoc } from './model.js';
 import { keyBetween } from './sortKey.js';
 
@@ -23,6 +23,7 @@ export type Command = Base & (
   | { kind: 'setConstraint'; activityId: string; constraint: ConstraintType; constraintDate?: Minutes | null }
   | { kind: 'setCalendar'; activityId: string; calendarId: string | null }
   | { kind: 'setProgress'; activityId: string; progress: ProgressPatch }
+  | { kind: 'updateLookups'; patch: LookupsPatch }
 );
 
 /** Fields set to null are cleared. */
@@ -32,6 +33,17 @@ export interface ProgressPatch {
   actualFinish?: Minutes | null;
   remaining?: Minutes | null;
   percentComplete?: number | null;
+}
+
+/**
+ * Project lists that activities point at: towers, floors (and their bottom-to-top order) and trades (activity
+ * templates, in construction order). A name of null removes an entry; a list of null clears it (D-032).
+ */
+export interface LookupsPatch {
+  towers?: Record<string, string | null>;
+  floors?: Record<string, string | null>;
+  floorOrder?: string[] | null;
+  templates?: { id: string; name: string; short?: string }[] | null;
 }
 
 export type CommandKind = Command['kind'];
@@ -156,6 +168,9 @@ export function applyCommand(doc: ScheduleDoc, c: Command): Applied {
           throw new CommandError('HAS_CHILDREN', `${a.code} has children and must stay a summary`, c.id);
         }
       }
+      if (c.patch.towerId && !(doc.towers && c.patch.towerId in doc.towers)) throw new CommandError('UNKNOWN_TOWER', `Tower ${c.patch.towerId} does not exist; add it first`, c.id);
+      if (c.patch.floorId && !(doc.floors && c.patch.floorId in doc.floors)) throw new CommandError('UNKNOWN_FLOOR', `Floor ${c.patch.floorId} does not exist; add it first`, c.id);
+      if (c.patch.activityTemplateId && !doc.templates?.some((x) => x.id === c.patch.activityTemplateId)) throw new CommandError('UNKNOWN_TRADE', `Trade ${c.patch.activityTemplateId} does not exist; add it first`, c.id);
       if (c.patch.duration !== undefined && c.patch.duration !== null && (!Number.isInteger(c.patch.duration) || c.patch.duration < 0)) {
         throw new CommandError('INVALID', 'Duration must be a non-negative whole number of minutes', c.id);
       }
@@ -283,6 +298,69 @@ export function applyCommand(doc: ScheduleDoc, c: Command): Applied {
       const { next, undo } = patchRecord(a, p as Record<string, unknown>);
       return { doc: replaceActivity(doc, next), inverse: [inv({ kind: 'updateActivity', activityId: a.id, patch: undo as ActivityPatch })] };
     }
+
+    case 'updateLookups': {
+      const p = c.patch;
+      const undo: LookupsPatch = {};
+      const next: ScheduleDoc = { ...doc };
+      const dict = (key: 'towers' | 'floors', field: 'towerId' | 'floorId', label: string) => {
+        const changes = p[key];
+        if (!changes) return;
+        const cur: Record<string, string> = { ...(doc[key] ?? {}) };
+        const back: Record<string, string | null> = {};
+        for (const [id, name] of Object.entries(changes)) {
+          back[id] = id in cur ? cur[id]! : null;
+          if (name === null) {
+            const n = doc.activities.filter((a) => a[field] === id).length;
+            if (n) throw new CommandError('IN_USE', `${label} ${cur[id] ?? id} is used by ${n} activit${n === 1 ? 'y' : 'ies'}`, c.id);
+            delete cur[id];
+          } else {
+            const clean = name.trim();
+            if (!clean) throw new CommandError('INVALID', `${label} name cannot be empty`, c.id);
+            cur[id] = clean;
+          }
+        }
+        const seen = new Map<string, string>();
+        for (const [id, name] of Object.entries(cur)) {
+          const k = name.toLowerCase();
+          if (seen.has(k)) throw new CommandError('DUPLICATE_NAME', `Two ${key} are called "${name}"`, c.id);
+          seen.set(k, id);
+        }
+        if (Object.keys(cur).length) next[key] = cur; else delete next[key];
+        undo[key] = back;
+      };
+      dict('towers', 'towerId', 'Tower');
+      dict('floors', 'floorId', 'Floor');
+      if (p.floorOrder !== undefined) {
+        undo.floorOrder = doc.floorOrder ? [...doc.floorOrder] : null;
+        if (p.floorOrder === null) delete next.floorOrder;
+        else {
+          if (new Set(p.floorOrder).size !== p.floorOrder.length) throw new CommandError('INVALID', 'Floor order repeats a floor', c.id);
+          next.floorOrder = [...p.floorOrder];
+        }
+      }
+      if (p.templates !== undefined) {
+        undo.templates = doc.templates ? doc.templates.map((x) => ({ ...x })) : null;
+        const list = p.templates ?? [];
+        const ids = new Set(list.map((x) => x.id));
+        if (ids.size !== list.length) throw new CommandError('INVALID', 'Two trades share an id', c.id);
+        const names = new Set<string>();
+        for (const x of list) {
+          if (!x.name.trim()) throw new CommandError('INVALID', 'Trade name cannot be empty', c.id);
+          const k = x.name.trim().toLowerCase();
+          if (names.has(k)) throw new CommandError('DUPLICATE_NAME', `Two trades are called "${x.name.trim()}"`, c.id);
+          names.add(k);
+        }
+        for (const old of doc.templates ?? []) {
+          if (ids.has(old.id)) continue;
+          const n = doc.activities.filter((a) => a.activityTemplateId === old.id).length;
+          if (n) throw new CommandError('IN_USE', `Trade ${old.name} is used by ${n} activit${n === 1 ? 'y' : 'ies'}`, c.id);
+        }
+        if (p.templates === null) delete next.templates;
+        else next.templates = list.map((x) => ({ ...x, name: x.name.trim(), ...(x.short?.trim() ? { short: x.short.trim() } : {}) }));
+      }
+      return { doc: next, inverse: [inv({ kind: 'updateLookups', patch: undo })] };
+    }
   }
 }
 
@@ -296,4 +374,14 @@ export function applyCommands(doc: ScheduleDoc, cmds: Command[]): Applied {
     inverses.push(r.inverse);
   }
   return { doc: { ...d, version: doc.version + 1 }, inverse: inverses.reverse().flat() };
+}
+
+/** Readable, unique id for a new tower/floor/trade: "T-TOWER-A", then "T-TOWER-A-2" if taken. */
+export function lookupId(prefix: string, name: string, taken: Iterable<string>): string {
+  const used = new Set(taken);
+  const base = `${prefix}-${name.trim().toUpperCase().replace(/[^A-Z0-9]+/g, '-').replace(/^-|-$/g, '') || 'X'}`;
+  if (!used.has(base)) return base;
+  let n = 2;
+  while (used.has(`${base}-${n}`)) n++;
+  return `${base}-${n}`;
 }

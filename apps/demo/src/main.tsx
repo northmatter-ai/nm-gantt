@@ -1,7 +1,7 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
-import '@nm/gantt/gantt.css';
-import '@nm/construction-views/views.css';
+import '@northmatter-ai/gantt/gantt.css';
+import '@northmatter-ai/construction-views/views.css';
 import './app.css';
 import { App } from './App';
 

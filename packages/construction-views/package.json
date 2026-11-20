@@ -1,20 +1,69 @@
 {
-  "name": "@nm/construction-views",
+  "name": "@northmatter-ai/construction-views",
   "version": "0.1.0",
-  "private": true,
+  "description": "Construction views for NorthMatter schedules: tower × floor grid, line of balance and look-ahead.",
+  "keywords": [
+    "scheduling",
+    "cpm",
+    "construction",
+    "northmatter"
+  ],
+  "license": "MIT",
+  "author": "NorthMatter AI",
+  "homepage": "https://github.com/northmatter-ai/nm-gantt/tree/main/packages/construction-views#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/northmatter-ai/nm-gantt.git",
+    "directory": "packages/construction-views"
+  },
+  "bugs": {
+    "url": "https://github.com/northmatter-ai/nm-gantt/issues"
+  },
   "type": "module",
-  "license": "UNLICENSED",
+  "sideEffects": [
+    "*.css"
+  ],
   "exports": {
     ".": "./src/index.ts",
     "./views.css": "./src/views.css"
   },
-  "scripts": { "typecheck": "tsc -p tsconfig.json" },
-  "dependencies": {
-    "@nm/calendar": "workspace:*",
-    "@nm/gantt": "workspace:*",
-    "@nm/schedule-commands": "workspace:*",
-    "@nm/schedule-engine": "workspace:*"
+  "files": [
+    "dist",
+    "src",
+    "!src/**/*.test.*",
+    "README.md",
+    "LICENSE"
+  ],
+  "publishConfig": {
+    "access": "public",
+    "exports": {
+      ".": {
+        "types": "./dist/index.d.ts",
+        "import": "./dist/index.js"
+      },
+      "./views.css": "./dist/views.css"
+    },
+    "main": "./dist/index.js",
+    "types": "./dist/index.d.ts"
   },
-  "peerDependencies": { "react": "^18.3.0 || ^19.0.0" },
-  "devDependencies": { "@types/react": "^19.0.0", "react": "^19.0.0" }
+  "scripts": {
+    "build": "node ../../scripts/build-package.mjs",
+    "typecheck": "tsc -p tsconfig.json"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "@northmatter-ai/calendar": "workspace:*",
+    "@northmatter-ai/gantt": "workspace:*",
+    "@northmatter-ai/schedule-commands": "workspace:*",
+    "@northmatter-ai/schedule-engine": "workspace:*"
+  },
+  "peerDependencies": {
+    "react": "^18.3.0 || ^19.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0",
+    "react": "^19.0.0"
+  }
 }

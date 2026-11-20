@@ -1,4 +1,4 @@
-import type { CalendarInput, Minutes } from '@nm/calendar';
+import type { CalendarInput, Minutes } from '@northmatter-ai/calendar';
 
 export type { CalendarInput, Minutes };
 export type LinkType = 'FS' | 'SS' | 'FF' | 'SF';

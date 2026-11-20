@@ -9,7 +9,7 @@ import {
   NoWorkingTimeError,
   type CompiledCalendar,
   type Minutes,
-} from '@nm/calendar';
+} from '@northmatter-ai/calendar';
 import { cycleOrder, findCycles, topoOrder } from './graph.js';
 import { hashInput } from './hash.js';
 import {

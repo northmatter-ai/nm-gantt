@@ -1,5 +1,5 @@
 {
-  "name": "@nm/gantt-demo",
+  "name": "@northmatter-ai/gantt-demo",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -10,14 +10,14 @@
     "typecheck": "tsc -p tsconfig.json"
   },
   "dependencies": {
-    "@nm/calendar": "workspace:*",
-    "@nm/gantt": "workspace:*",
-    "@nm/schedule-commands": "workspace:*",
-    "@nm/schedule-engine": "workspace:*",
-    "@nm/schedule-io": "workspace:*",
+    "@northmatter-ai/calendar": "workspace:*",
+    "@northmatter-ai/gantt": "workspace:*",
+    "@northmatter-ai/schedule-commands": "workspace:*",
+    "@northmatter-ai/schedule-engine": "workspace:*",
+    "@northmatter-ai/schedule-io": "workspace:*",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "@nm/construction-views": "workspace:*"
+    "@northmatter-ai/construction-views": "workspace:*"
   },
   "devDependencies": {
     "@types/react": "^19.0.0",

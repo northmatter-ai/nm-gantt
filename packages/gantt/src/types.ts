@@ -1,6 +1,6 @@
-import type { Minutes } from '@nm/calendar';
-import type { Command, ScheduleDoc, ScheduleVersionView } from '@nm/schedule-commands';
-import type { ScheduleResult } from '@nm/schedule-engine';
+import type { Minutes } from '@northmatter-ai/calendar';
+import type { Command, ScheduleDoc, ScheduleVersionView } from '@northmatter-ai/schedule-commands';
+import type { ScheduleResult } from '@northmatter-ai/schedule-engine';
 
 export type Zoom = 'day' | 'week' | 'month' | 'quarter' | 'year';
 export type GroupBy = 'none' | 'tower' | 'floor' | 'wbs';
@@ -55,6 +55,11 @@ export interface GanttProps {
   createWorker?: () => Worker | null;
   /** Height of the component; defaults to filling its parent. */
   height?: number | string;
+  /**
+   * Undo/redo store owned by the host (from createUndoHistory). Pass the same object again after a remount — e.g.
+   * switching tabs — to keep the history. Use a new one per schedule version source.
+   */
+  history?: { undo: Command[][]; redo: Command[][] };
 }
 
 export const DEFAULT_COLUMNS: ColumnDef[] = [

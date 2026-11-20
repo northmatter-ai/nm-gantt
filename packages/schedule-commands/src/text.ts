@@ -3,8 +3,8 @@
  *   durations   "5d", "3w", "16h", "90m", "2.5d" (a bare number = days)
  *   predecessors "12FS+2d; 15SS; KAV-T1-F05-SLAB FF-1d" (MS Project style, by code or row number)
  */
-import type { Minutes } from '@nm/calendar';
-import type { LinkType } from '@nm/schedule-engine';
+import type { Minutes } from '@northmatter-ai/calendar';
+import type { LinkType } from '@northmatter-ai/schedule-engine';
 
 const UNIT: Record<string, number> = { m: 1, min: 1, h: 60, hr: 60, d: 0, day: 0, days: 0, w: -1, wk: -1, mo: -2 };
 

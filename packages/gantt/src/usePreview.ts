@@ -1,7 +1,7 @@
 /** Runs the engine in a Web Worker to preview edits; falls back to the main thread. */
 import { useCallback, useEffect, useRef } from 'react';
-import { calculate, type ScheduleResult } from '@nm/schedule-engine';
-import { toScheduleInput, type ScheduleDoc } from '@nm/schedule-commands';
+import { calculate, type ScheduleResult } from '@northmatter-ai/schedule-engine';
+import { toScheduleInput, type ScheduleDoc } from '@northmatter-ai/schedule-commands';
 
 export function defaultWorker(): Worker | null {
   if (typeof Worker === 'undefined') return null;

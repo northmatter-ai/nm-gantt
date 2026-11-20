@@ -3,9 +3,9 @@
  * in order, all or nothing, checks the base version (409 VERSION_CONFLICT), recalculates with the
  * engine and returns the authoritative result — the same contract the real service will keep.
  */
-import { calculate, type ScheduleResult } from '@nm/schedule-engine';
-import { applyCommands, CommandError, makeBaseline, toScheduleInput, type BaselineView, type Command, type ScheduleDoc } from '@nm/schedule-commands';
-import type { CommandResult } from '@nm/gantt';
+import { calculate, type ScheduleResult } from '@northmatter-ai/schedule-engine';
+import { applyCommands, CommandError, makeBaseline, toScheduleInput, type BaselineView, type Command, type ScheduleDoc } from '@northmatter-ai/schedule-commands';
+import type { CommandResult } from '@northmatter-ai/gantt';
 
 export interface ServerState {
   doc: ScheduleDoc;

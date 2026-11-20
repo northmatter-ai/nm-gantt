@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import fc from 'fast-check';
-import { defaultTenantCalendar, parseLocal } from '@nm/calendar';
-import { calculate } from '@nm/schedule-engine';
+import { defaultTenantCalendar, parseLocal } from '@northmatter-ai/calendar';
+import { calculate } from '@northmatter-ai/schedule-engine';
 import {
   applyCommands,
   childrenOf,
@@ -12,6 +12,7 @@ import {
   formatPredecessor,
   keyBetween,
   keysAfter,
+  lookupId,
   parseDuration,
   parsePredecessors,
   toScheduleInput,
@@ -68,6 +69,32 @@ describe('commands and their inverses', () => {
     const d2 = roundTrip([cmd({ kind: 'outdent', activityId: 'B' })], d);
     expect(d2.activities.find((a) => a.id === 'A')!.type).toBe('summary');
     expect(d2.activities.find((a) => a.id === 'B')!.parentId).toBeUndefined();
+  });
+  it('updateLookups adds, renames and removes towers, floors and trades, and undoes exactly', () => {
+    const d = roundTrip([cmd({ kind: 'updateLookups', patch: {
+      towers: { TA: 'Tower A', TB: 'Tower B' }, floors: { F1: 'Floor 1', F2: 'Floor 2' }, floorOrder: ['F1', 'F2'],
+      templates: [{ id: 'SLAB', name: 'Slab', short: 'Slab' }],
+    } })]);
+    expect(d.towers).toEqual({ TA: 'Tower A', TB: 'Tower B' });
+    expect(d.floorOrder).toEqual(['F1', 'F2']);
+    // Activities can now point at them; unknown ids are refused.
+    const { doc: d2 } = applyCommands(d, [cmd({ kind: 'updateActivity', activityId: 'A', patch: { towerId: 'TA', floorId: 'F2', activityTemplateId: 'SLAB' } })]);
+    expect(() => applyCommands(d, [cmd({ kind: 'updateActivity', activityId: 'A', patch: { towerId: 'NOPE' } })])).toThrow(/Tower NOPE does not exist/);
+    expect(() => applyCommands(d, [cmd({ kind: 'updateActivity', activityId: 'A', patch: { activityTemplateId: 'NOPE' } })])).toThrow(/UNKNOWN_TRADE|Trade NOPE/);
+    // In-use entries cannot be removed; unused ones can; renames keep ids.
+    expect(() => applyCommands(d2, [cmd({ kind: 'updateLookups', patch: { towers: { TA: null } } })])).toThrow(/used by 1 activity/);
+    expect(() => applyCommands(d2, [cmd({ kind: 'updateLookups', patch: { templates: [] } })])).toThrow(/Trade Slab is used/);
+    const { doc: d3, inverse } = applyCommands(d2, [cmd({ kind: 'updateLookups', patch: { towers: { TA: 'Kaveri A', TB: null } } })]);
+    expect(d3.towers).toEqual({ TA: 'Kaveri A' });
+    expect(applyCommands(d3, inverse).doc.towers).toEqual({ TA: 'Tower A', TB: 'Tower B' });
+    // Names must be non-empty and unique (ignoring case).
+    expect(() => applyCommands(d, [cmd({ kind: 'updateLookups', patch: { floors: { F3: 'floor 1' } } })])).toThrow(/DUPLICATE_NAME|Two floors/);
+    expect(() => applyCommands(d, [cmd({ kind: 'updateLookups', patch: { towers: { TC: '  ' } } })])).toThrow(/cannot be empty/);
+  });
+  it('lookupId makes readable unique ids', () => {
+    expect(lookupId('T', 'Tower A', [])).toBe('T-TOWER-A');
+    expect(lookupId('T', 'tower a', ['T-TOWER-A', 'T-TOWER-A-2'])).toBe('T-TOWER-A-3');
+    expect(lookupId('F', 'टावर', [])).toBe('F-X');
   });
   it('indent is refused when the new parent has links', () => {
     expect(() => applyCommands(doc(), [cmd({ kind: 'indent', activityId: 'B' })])).toThrow(CommandError);

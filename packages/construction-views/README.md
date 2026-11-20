@@ -1,4 +1,4 @@
-# @nm/construction-views
+# @northmatter-ai/construction-views
 
 The three high-rise views from the spec. They read the same schedule version and results as the Gantt and use its time-scale utilities.
 
@@ -12,4 +12,4 @@ Site inputs come in as a `SiteData` object keyed by activity `stableKey`: report
 
 All derivations (`buildTowerGrid`, `buildLob`, `buildLookahead`, `cellState`) are pure functions in `model.ts`, so the server can reuse them for reports.
 
-Import `@nm/construction-views/views.css`. Colours follow a validated categorical palette in fixed order (never cycled; trades past the eighth are drawn neutral grey), with light and dark steps.
+Import `@northmatter-ai/construction-views/views.css`. Colours follow a validated categorical palette in fixed order (never cycled; trades past the eighth are drawn neutral grey), with light and dark steps.

@@ -1,20 +1,35 @@
 # nm-gantt — NorthMatter scheduling engine and Gantt
 
-An in-house critical path scheduling engine and React Gantt chart with no paid licence. This repo builds it from the build spec "Scheduling Engine & Gantt — Build Spec" (Claude Docs). Where code and spec disagree, the spec wins. Interpretations are recorded in [DECISIONS.md](DECISIONS.md).
+A critical path scheduling engine and React Gantt chart, MIT-licensed and published on npm under `@northmatter-ai`. This repo builds it from the build spec "Scheduling Engine & Gantt — Build Spec" (Claude Docs). Where code and spec disagree, the spec wins. Interpretations are recorded in [DECISIONS.md](DECISIONS.md).
 
 ## Packages
 
 | Package | What it is | Runs in |
 |---|---|---|
-| [`@nm/calendar`](packages/calendar) | Working-time calendars: `nextWorkStart`, `prevWorkEnd`, `finishFrom`, `startFrom`, `workBetween`, `shift`; inheritance, exceptions, IANA zones via `Intl` | Node, browser |
-| [`@nm/schedule-engine`](packages/schedule-engine) | CPM: validation (Tarjan cycles), Kahn ordering, forward/backward passes, 4 link types, lags, 8 constraints, deadlines, total and free float, driving links, critical and longest path, ALAP, summaries, level of effort, progress and data date, baselines and variance, warnings | Node, browser, Web Worker |
-| [`@nm/schedule-commands`](packages/schedule-commands) | The schedule document model and the 12 edit commands with inverses (undo/redo, audit, server), fractional sort keys, duration and predecessor text parsing | Node, browser |
-| [`@nm/schedule-io`](packages/schedule-io) | MS Project XML (MSPDI) and Excel (.xlsx, the spec's template) import with a dry-run report, and export with computed dates | Node, browser |
-| [`@nm/construction-views`](packages/construction-views) | Tower × floor grid, line of balance, look-ahead board (readiness, commitments, PPC, print to PDF), activity details with inspections and DPR photos | Browser |
-| [`@nm/gantt`](packages/gantt) | React Gantt: virtualised tree grid and SVG timeline, all bar types, links, zoom, filters, grouping, drag/resize/progress/link-drawing, editor, undo/redo, keyboard, ARIA treegrid, light/dark, English/Hindi; read-only phone view (pinch zoom, tap for details) | Browser |
+| [`@northmatter-ai/calendar`](packages/calendar) | Working-time calendars: `nextWorkStart`, `prevWorkEnd`, `finishFrom`, `startFrom`, `workBetween`, `shift`; inheritance, exceptions, IANA zones via `Intl` | Node, browser |
+| [`@northmatter-ai/schedule-engine`](packages/schedule-engine) | CPM: validation (Tarjan cycles), Kahn ordering, forward/backward passes, 4 link types, lags, 8 constraints, deadlines, total and free float, driving links, critical and longest path, ALAP, summaries, level of effort, progress and data date, baselines and variance, warnings | Node, browser, Web Worker |
+| [`@northmatter-ai/schedule-commands`](packages/schedule-commands) | The schedule document model and the edit commands with inverses: the spec's 12 plus `updateLookups` for towers, floors and trades (D-032). Undo/redo, audit, server; fractional sort keys; duration and predecessor text parsing | Node, browser |
+| [`@northmatter-ai/schedule-io`](packages/schedule-io) | MS Project XML (MSPDI) and Excel (.xlsx, the spec's template) import with a dry-run report, and export with computed dates | Node, browser |
+| [`@northmatter-ai/construction-views`](packages/construction-views) | Tower × floor grid, line of balance, look-ahead board (readiness, commitments, PPC, print to PDF), activity details with inspections and DPR photos | Browser |
+| [`@northmatter-ai/gantt`](packages/gantt) | React Gantt: virtualised tree grid and SVG timeline, all bar types, links, zoom, filters, grouping, drag/resize/progress/link-drawing, editor, undo/redo, keyboard, ARIA treegrid, light/dark, English/Hindi; read-only phone view (pinch zoom, tap for details) | Browser |
 | [`apps/demo`](apps/demo) | Demo app with a mock Planning server (command batches, version check, recalculation) and sample schedules | Browser |
 
 All packages have no runtime dependencies except these: `@tanstack/react-virtual` (MIT) in the Gantt, and `fast-xml-parser` (MIT) and `fflate` (MIT) in schedule-io. The engine and calendar have none at all.
+
+## Install
+
+```bash
+npm install @northmatter-ai/gantt react react-dom   # pulls in calendar, schedule-engine, schedule-commands
+npm install @northmatter-ai/schedule-io             # optional: MS Project XML and Excel
+npm install @northmatter-ai/construction-views      # optional: tower grid, line of balance, look-ahead
+```
+
+```tsx
+import { Gantt } from '@northmatter-ai/gantt';
+import '@northmatter-ai/gantt/gantt.css';
+```
+
+The packages are ES modules only and need a bundler that handles `new URL('./x.js', import.meta.url)` workers (Vite, webpack 5, Rollup, Parcel). To publish a new version, see [RELEASING.md](RELEASING.md).
 
 ## Run it
 
@@ -35,7 +50,7 @@ The demo opens a sample residential project: two towers × 12 floors and 215 act
 ## Using the engine
 
 ```ts
-import { calculate } from '@nm/schedule-engine';
+import { calculate } from '@northmatter-ai/schedule-engine';
 const result = calculate({ projectStart, dataDate, defaultCalendarId: 'std', calendars, activities, links, settings });
 if (!result.ok) console.log(result.errors); // never throws on a bad schedule
 result.activities['A'].totalFloat;           // integer working minutes
@@ -44,8 +59,8 @@ result.activities['A'].totalFloat;           // integer working minutes
 ## Using the Gantt
 
 ```tsx
-import { Gantt } from '@nm/gantt';
-import '@nm/gantt/gantt.css';
+import { Gantt } from '@northmatter-ai/gantt';
+import '@northmatter-ai/gantt/gantt.css';
 
 <Gantt
   version={{ doc, results, baselines }}
@@ -61,7 +76,7 @@ The component holds no business rules. Each user action becomes a command. The e
 
 | # | Milestone | Status |
 |---|---|---|
-| M1 | `@nm/calendar` | **Done.** All calendar tests pass, plus the performance target: 100k `finishFrom` in < 150 ms. |
+| M1 | `@northmatter-ai/calendar` | **Done.** All calendar tests pass, plus the performance target: 100k `finishFrom` in < 150 ms. |
 | M2 | Engine core | **Done.** Golden files are not yet matched (none available). |
 | M3 | Link types, lags, constraints, float, paths, ALAP, summaries, LOE | **Done.** Property tests 1–7 pass. 10k activities + 20k links calculate in < 500 ms. Synthetic MSP golden files not yet matched. |
 | M4 | Progress, data date, baselines, variance, validation, warnings | **Done** in the engine. Golden files with a status date are pending. |

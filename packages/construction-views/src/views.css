@@ -1,4 +1,4 @@
-/* @nm/construction-views. Categorical slots are a fixed order (never cycled); states use the status colours plus an icon and a pattern. */
+/* @northmatter-ai/construction-views. Categorical slots are a fixed order (never cycled); states use the status colours plus an icon and a pattern. */
 .nmc, .nmc-backdrop {
   color-scheme: light;
   --nmc-surface: #fcfcfb;

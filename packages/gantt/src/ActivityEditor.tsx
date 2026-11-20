@@ -1,18 +1,20 @@
 /** Activity editor dialog: general, predecessors, successors, constraints, progress, notes. */
 import { useMemo, useState } from 'react';
-import type { CompiledCalendar } from '@nm/calendar';
-import type { ActivityType, ConstraintType, LinkType } from '@nm/schedule-engine';
+import type { CompiledCalendar } from '@northmatter-ai/calendar';
+import type { ActivityType, ConstraintType, LinkType } from '@northmatter-ai/schedule-engine';
 import {
   cmd,
   formatDuration,
+  lookupId,
   newId,
   parseDuration,
   type ActivityPatch,
   type ActivityRecord,
   type Command,
   type LinkRecord,
+  type LookupsPatch,
   type ScheduleDoc,
-} from '@nm/schedule-commands';
+} from '@northmatter-ai/schedule-commands';
 import { fromInputValue, toInputValue } from './format.js';
 import type { Translate } from './i18n.js';
 
@@ -23,6 +25,16 @@ const CONSTRAINTS: ConstraintType[] = ['ASAP', 'ALAP', 'SNET', 'SNLT', 'FNET', '
 const LINK_TYPES: LinkType[] = ['FS', 'SS', 'FF', 'SF'];
 
 interface PredRow { linkId?: string; from: string; type: LinkType; lag: string }
+
+/** Select value meaning "type a new name". */
+const NEW = '__new__';
+
+/** Trades in construction order, plus any trade id an activity uses that the list lacks. */
+export function tradeOptions(doc: ScheduleDoc): [string, string][] {
+  const out: [string, string][] = (doc.templates ?? []).map((x) => [x.id, x.name]);
+  for (const a of doc.activities) if (a.activityTemplateId && !out.some(([id]) => id === a.activityTemplateId)) out.push([a.activityTemplateId, a.activityTemplateId]);
+  return out;
+}
 
 export interface ActivityEditorProps {
   doc: ScheduleDoc;
@@ -35,6 +47,16 @@ export interface ActivityEditorProps {
   onClose: () => void;
 }
 
+/** Floors bottom to top: the project's order, else natural order of names. */
+export function floorOptions(doc: ScheduleDoc): [string, string][] {
+  const all = Object.entries(doc.floors ?? {});
+  if (doc.floorOrder?.length) {
+    const rank = new Map(doc.floorOrder.map((id, i) => [id, i]));
+    return all.sort(([a], [b]) => (rank.get(a) ?? 1e9) - (rank.get(b) ?? 1e9));
+  }
+  return all.sort(([, x], [, y]) => x.localeCompare(y, undefined, { numeric: true }));
+}
+
 export function ActivityEditor({ doc, activity: a, cal, tz, t, readOnly, onSave, onClose }: ActivityEditorProps) {
   const [tab, setTab] = useState<Tab>('general');
   const [name, setName] = useState(a.name);
@@ -44,6 +66,8 @@ export function ActivityEditor({ doc, activity: a, cal, tz, t, readOnly, onSave,
   const [calendarId, setCalendarId] = useState(a.calendarId ?? '');
   const [towerId, setTowerId] = useState(a.towerId ?? '');
   const [floorId, setFloorId] = useState(a.floorId ?? '');
+  const [tradeId, setTradeId] = useState(a.activityTemplateId ?? '');
+  const [newName, setNewName] = useState<Record<'tower' | 'floor' | 'trade', string>>({ tower: '', floor: '', trade: '' });
   const [constraint, setConstraint] = useState<ConstraintType>(a.constraint);
   const [constraintDate, setConstraintDate] = useState(toInputValue(tz, a.constraintDate));
   const [deadline, setDeadline] = useState(toInputValue(tz, a.deadline));
@@ -70,8 +94,28 @@ export function ActivityEditor({ doc, activity: a, cal, tz, t, readOnly, onSave,
     const d = parseDuration(duration, cal.hoursPerDay);
     if (d === null || d < 0) { setError(`${t('duration')}: "${duration}"`); return; }
     if (d !== a.duration) patch.duration = d;
-    if ((towerId || undefined) !== a.towerId) patch.towerId = towerId || null;
-    if ((floorId || undefined) !== a.floorId) patch.floorId = floorId || null;
+    // New towers, floors and trades typed here are added to the project first, in the same undoable batch.
+    const lookups: LookupsPatch = {};
+    const resolve = (kind: 'tower' | 'floor' | 'trade', sel: string, existing: [string, string][], prefix: string): string | null | false => {
+      if (sel !== NEW) return sel || null;
+      const typed = newName[kind].trim();
+      if (!typed) { setError(t('lookupNameNeeded', { what: t(kind) })); return false; }
+      const hit = existing.find(([, n]) => n.toLowerCase() === typed.toLowerCase());
+      if (hit) return hit[0];
+      const id = lookupId(prefix, typed, existing.map(([i]) => i));
+      if (kind === 'tower') lookups.towers = { [id]: typed };
+      if (kind === 'floor') { lookups.floors = { [id]: typed }; if (doc.floorOrder) lookups.floorOrder = [...doc.floorOrder, id]; }
+      if (kind === 'trade') lookups.templates = [...(doc.templates ?? []), { id, name: typed }];
+      return id;
+    };
+    const tw = resolve('tower', towerId, Object.entries(doc.towers ?? {}), 'T');
+    const fl = resolve('floor', floorId, Object.entries(doc.floors ?? {}), 'F');
+    const tr = resolve('trade', tradeId, tradeOptions(doc), 'TR');
+    if (tw === false || fl === false || tr === false) return;
+    if (Object.keys(lookups).length) cmds.push(cmd({ kind: 'updateLookups', patch: lookups }));
+    if ((tw ?? undefined) !== a.towerId) patch.towerId = tw;
+    if ((fl ?? undefined) !== a.floorId) patch.floorId = fl;
+    if ((tr ?? undefined) !== a.activityTemplateId) patch.activityTemplateId = tr;
     const dl = fromInputValue(tz, deadline);
     if (dl !== a.deadline) patch.deadline = dl ?? null;
     if ((notes || undefined) !== a.notes) patch.notes = notes || null;
@@ -111,6 +155,22 @@ export function ActivityEditor({ doc, activity: a, cal, tz, t, readOnly, onSave,
   const field = (label: string, input: React.ReactNode) => (
     <label className="nm-field"><span>{label}</span>{input}</label>
   );
+  const lookupField = (kind: 'tower' | 'floor' | 'trade', value: string, set: (v: string) => void, options: [string, string][], addLabel: string, example: string) => (
+    <div className="nm-field">
+      <label htmlFor={`nm-lk-${kind}`}>{t(kind)}</label>
+      <div className="nm-lookup">
+        <select id={`nm-lk-${kind}`} value={value} onChange={(e) => set(e.target.value)}>
+          <option value="">—</option>
+          {options.map(([id, n]) => <option key={id} value={id}>{n}</option>)}
+          <option value={NEW}>{addLabel}</option>
+        </select>
+        {value === NEW && (
+          <input autoFocus aria-label={t('lookupNewName', { what: t(kind) })} placeholder={example} value={newName[kind]}
+            onChange={(e) => setNewName({ ...newName, [kind]: e.target.value })} />
+        )}
+      </div>
+    </div>
+  );
 
   return (
     <div className="nm-modal-backdrop" onMouseDown={(e) => { if (e.target === e.currentTarget) onClose(); }}>
@@ -132,8 +192,10 @@ export function ActivityEditor({ doc, activity: a, cal, tz, t, readOnly, onSave,
               {field(t('type'), <select value={type} onChange={(e) => setType(e.target.value as ActivityType)}>{TYPES.map((x) => <option key={x} value={x}>{t(x)}</option>)}</select>)}
               {field(t('duration'), <input value={duration} onChange={(e) => setDuration(e.target.value)} placeholder="5d, 3w, 16h" />)}
               {field(t('calendar'), <select value={calendarId} onChange={(e) => setCalendarId(e.target.value)}><option value="">{t('defaultCal')}</option>{doc.calendars.map((c) => <option key={c.id} value={c.id}>{c.name ?? c.id}</option>)}</select>)}
-              {field(t('tower'), <select value={towerId} onChange={(e) => setTowerId(e.target.value)}><option value="">—</option>{Object.entries(doc.towers ?? {}).map(([id, n]) => <option key={id} value={id}>{n}</option>)}</select>)}
-              {field(t('floor'), <select value={floorId} onChange={(e) => setFloorId(e.target.value)}><option value="">—</option>{Object.entries(doc.floors ?? {}).map(([id, n]) => <option key={id} value={id}>{n}</option>)}</select>)}
+              {lookupField('tower', towerId, setTowerId, Object.entries(doc.towers ?? {}), t('addTower'), 'Tower A')}
+              {lookupField('floor', floorId, setFloorId, floorOptions(doc), t('addFloor'), 'Floor 1')}
+              {lookupField('trade', tradeId, setTradeId, tradeOptions(doc), t('addTrade'), t('tradeExample'))}
+              <p className="nm-form-hint">{t('lookupHint')}</p>
             </div>
           )}
           {tab === 'predecessors' && (

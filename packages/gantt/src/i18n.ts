@@ -34,6 +34,12 @@ const en = {
   phWeekOf: 'Week of {d}', phProject: 'Project', phDone: 'Done', phLate: '{n} late', phStatus: 'Status', phPlanned: 'Dates', phFloat: 'Total float',
   phVsBaseline: 'Against baseline', phOnTime: 'On time', phDaysLate: '{n} days late', phDaysEarly: '{n} days early',
   phReadOnly: 'View only. Changes are made in the planning app on a computer.',
+  trade: 'Trade', addTower: '+ Add tower…', addFloor: '+ Add floor…', addTrade: '+ Add trade…', tradeExample: 'Slab casting',
+  lookupNewName: 'New {what} name', lookupNameNeeded: 'Type a name for the new {what}',
+  lookupHint: 'Tower, floor and trade put the activity on the Tower × floor grid and line of balance.',
+  setupTitle: 'Towers, floors & trades', setupOpen: 'Towers, floors & trades…', towersList: 'Towers', floorsList: 'Floors, bottom to top',
+  tradesList: 'Trades, in construction order', moveUp: 'Move up', moveDown: 'Move down', usedBy: '{n} activities', inUseNoRemove: 'In use, so it cannot be removed',
+  addFloorsRange: 'Add floors', fromN: 'from', toN: 'to', nameCol: 'Name', shortCol: 'Short name', newEntry: 'New', setupEmpty: 'None yet',
 };
 
 type Dict = typeof en;
@@ -72,6 +78,12 @@ const hi: Dict = {
   phWeekOf: '{d} का सप्ताह', phProject: 'प्रोजेक्ट', phDone: 'पूर्ण', phLate: '{n} देरी', phStatus: 'स्थिति', phPlanned: 'तिथियाँ', phFloat: 'कुल फ़्लोट',
   phVsBaseline: 'बेसलाइन की तुलना में', phOnTime: 'समय पर', phDaysLate: '{n} दिन देरी', phDaysEarly: '{n} दिन पहले',
   phReadOnly: 'केवल देखने के लिए। बदलाव कंप्यूटर पर प्लानिंग ऐप में करें।',
+  trade: 'ट्रेड', addTower: '+ टावर जोड़ें…', addFloor: '+ मंज़िल जोड़ें…', addTrade: '+ ट्रेड जोड़ें…', tradeExample: 'स्लैब ढलाई',
+  lookupNewName: 'नए {what} का नाम', lookupNameNeeded: 'नए {what} का नाम लिखें',
+  lookupHint: 'टावर, मंज़िल और ट्रेड से गतिविधि टावर × मंज़िल ग्रिड और लाइन ऑफ़ बैलेंस पर दिखती है।',
+  setupTitle: 'टावर, मंज़िलें और ट्रेड', setupOpen: 'टावर, मंज़िलें और ट्रेड…', towersList: 'टावर', floorsList: 'मंज़िलें, नीचे से ऊपर',
+  tradesList: 'ट्रेड, निर्माण क्रम में', moveUp: 'ऊपर ले जाएँ', moveDown: 'नीचे ले जाएँ', usedBy: '{n} गतिविधियाँ', inUseNoRemove: 'उपयोग में है, हटाया नहीं जा सकता',
+  addFloorsRange: 'मंज़िलें जोड़ें', fromN: 'से', toN: 'तक', nameCol: 'नाम', shortCol: 'छोटा नाम', newEntry: 'नया', setupEmpty: 'अभी कोई नहीं',
 };
 
 const dicts: Record<Locale, Dict> = { en, hi };

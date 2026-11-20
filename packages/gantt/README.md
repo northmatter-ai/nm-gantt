@@ -1,4 +1,4 @@
-# @nm/gantt
+# @northmatter-ai/gantt
 
 React Gantt chart: a tree grid and an SVG timeline sharing one vertical scroll, virtualised with `@tanstack/react-virtual`.
 
@@ -25,12 +25,12 @@ React Gantt chart: a tree grid and an SVG timeline sharing one vertical scroll, 
 | Shift+wheel | Horizontal scroll |
 | Right-click | Context menu |
 
-Import `@nm/gantt/gantt.css`. Theme it with CSS variables on `.nm-gantt`. Dark mode follows `prefers-color-scheme`, or set `data-theme="dark"|"light"` on `<html>`.
+Import `@northmatter-ai/gantt/gantt.css`. Theme it with CSS variables on `.nm-gantt`. Dark mode follows `prefers-color-scheme`, or set `data-theme="dark"|"light"` on `<html>`.
 
 ## Phone view
 
 ```tsx
-import { PhoneSchedule } from '@nm/gantt';
+import { PhoneSchedule } from '@northmatter-ai/gantt';
 <PhoneSchedule version={{ doc, results, baselines }} initialScope={{ kind: 'lookahead', weeks: 3 }} showBaselineId="bl-1" locale="hi" />
 ```
 
@@ -43,3 +43,12 @@ This is a read-only list-plus-bars view for the Site app (spec: "View and mobile
 - **No editing.**
 
 The list rules live in `buildPhoneList` (pure, unit-tested). See DECISIONS D-031.
+
+## Undo history across remounts
+
+The Gantt keeps undo/redo stacks of inverse command batches, 100 steps deep. If your app unmounts the Gantt (tabs, routes), keep the history yourself and pass it back:
+
+```tsx
+const history = useMemo(() => createUndoHistory(), [scheduleId]);
+<Gantt history={history} … />
+```
