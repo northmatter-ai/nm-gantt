@@ -2,9 +2,9 @@
  * Stand-in for what the Site app sends (DPR reports, certifications, readiness, commitments,
  * inspections, photos). Deterministic, derived from the schedule so the demo is stable.
  */
-import type { SiteData } from '@northmatter-ai/construction-views';
-import type { ScheduleDoc } from '@northmatter-ai/schedule-commands';
-import type { ScheduleResult } from '@northmatter-ai/schedule-engine';
+import type { SiteData } from '@northmatter/construction-views';
+import type { ScheduleDoc } from '@northmatter/schedule-commands';
+import type { ScheduleResult } from '@northmatter/schedule-engine';
 
 const DAY = 1440;
 

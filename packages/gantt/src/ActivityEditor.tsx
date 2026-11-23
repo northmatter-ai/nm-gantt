@@ -1,7 +1,7 @@
 /** Activity editor dialog: general, predecessors, successors, constraints, progress, notes. */
 import { useMemo, useState } from 'react';
-import type { CompiledCalendar } from '@northmatter-ai/calendar';
-import type { ActivityType, ConstraintType, LinkType } from '@northmatter-ai/schedule-engine';
+import type { CompiledCalendar } from '@northmatter/calendar';
+import type { ActivityType, ConstraintType, LinkType } from '@northmatter/schedule-engine';
 import {
   cmd,
   formatDuration,
@@ -14,7 +14,7 @@ import {
   type LinkRecord,
   type LookupsPatch,
   type ScheduleDoc,
-} from '@northmatter-ai/schedule-commands';
+} from '@northmatter/schedule-commands';
 import { fromInputValue, toInputValue } from './format.js';
 import type { Translate } from './i18n.js';
 

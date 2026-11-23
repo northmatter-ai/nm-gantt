@@ -1,15 +1,15 @@
 # Releasing to npm
 
-The six packages in `packages/` are published to npm as public MIT packages under the **`@northmatter-ai`** scope. They always share one version number and are released together. `apps/demo` and the repo root are private and are never published.
+The six packages in `packages/` are published to npm as public MIT packages under the **`@northmatter`** scope. They always share one version number and are released together. `apps/demo` and the repo root are private and are never published.
 
 | Package | Depends on |
 |---|---|
-| `@northmatter-ai/calendar` | — |
-| `@northmatter-ai/schedule-engine` | calendar |
-| `@northmatter-ai/schedule-commands` | calendar, schedule-engine |
-| `@northmatter-ai/schedule-io` | calendar, schedule-engine, schedule-commands |
-| `@northmatter-ai/gantt` | calendar, schedule-engine, schedule-commands |
-| `@northmatter-ai/construction-views` | the four above, except schedule-io |
+| `@northmatter/calendar` | — |
+| `@northmatter/schedule-engine` | calendar |
+| `@northmatter/schedule-commands` | calendar, schedule-engine |
+| `@northmatter/schedule-io` | calendar, schedule-engine, schedule-commands |
+| `@northmatter/gantt` | calendar, schedule-engine, schedule-commands |
+| `@northmatter/construction-views` | the four above, except schedule-io |
 
 ## How packaging works
 
@@ -31,7 +31,7 @@ The six packages in `packages/` are published to npm as public MIT packages unde
 ## One-time setup
 
 1. **npm account.** Sign up at npmjs.com, turn on 2FA (Account → Two-Factor Authentication, "Authorization and writes"), then run `npm login` on your machine. `npm whoami` should print your username.
-2. **npm org.** On npmjs.com: avatar → *Add Organization* → name **`northmatter-ai`** → *Unlimited public packages* (free). Invite other maintainers under *Members*.
+2. **npm org.** On npmjs.com: avatar → *Add Organization* → name **`northmatter`** → *Unlimited public packages* (free). Invite other maintainers under *Members*.
 3. **First publish (by hand, from your machine).** npm trusted publishing can only be set up for a package that already exists, so the first release goes from a laptop:
    ```bash
    git checkout master && git pull
@@ -40,9 +40,9 @@ The six packages in `packages/` are published to npm as public MIT packages unde
    pnpm release                     # full CI, then publishes all six (asks for your 2FA code)
    git tag v0.1.0 && git push origin v0.1.0
    ```
-   Check the result: `npm view @northmatter-ai/gantt`, and https://www.npmjs.com/package/@northmatter-ai/gantt.
+   Check the result: `npm view @northmatter/gantt`, and https://www.npmjs.com/package/@northmatter/gantt.
 4. **Trusted publishing (for every release after that).** For **each of the six packages** on npmjs.com, go to *Settings → Trusted publishing → GitHub Actions* and enter:
-   - Organization or user: `northmatter-ai`
+   - Organization or user: `northmatter-ai` (the GitHub org, not the npm one)
    - Repository: `nm-gantt`
    - Workflow filename: `release.yml`
    - Environment: leave empty
@@ -67,7 +67,7 @@ The workflow:
 - runs the whole CI (typecheck, tests, licences, e2e) and `check:packages`;
 - publishes all six with `--provenance`.
 
-**Pre-releases:** `pnpm set-version 0.2.0-beta.1` and tag `v0.2.0-beta.1`. Anything with a `-` goes to the `next` dist-tag, so `npm install @northmatter-ai/gantt` still gets the last stable version. Users opt in with `@next`.
+**Pre-releases:** `pnpm set-version 0.2.0-beta.1` and tag `v0.2.0-beta.1`. Anything with a `-` goes to the `next` dist-tag, so `npm install @northmatter/gantt` still gets the last stable version. Users opt in with `@next`.
 
 ## Versioning rules
 
@@ -79,6 +79,6 @@ We follow semver. Under 1.0, a minor bump (0.x.0) may break things and a patch b
 
 ## If something goes wrong
 
-- **A bad version was published:** `npm deprecate @northmatter-ai/gantt@0.2.0 "broken worker URL, use 0.2.1"`, then release a fix. `npm unpublish` only works within 72 hours, and a version number can never be reused, so prefer deprecating.
+- **A bad version was published:** `npm deprecate @northmatter/gantt@0.2.0 "broken worker URL, use 0.2.1"`, then release a fix. `npm unpublish` only works within 72 hours, and a version number can never be reused, so prefer deprecating.
 - **Publish failed halfway:** run the same `pnpm release` or workflow again. pnpm skips versions that are already on the registry.
-- **`E403` / `E404` on publish:** you aren't a member of the `northmatter-ai` org, or (in CI) the trusted publisher entry doesn't match the repo or workflow name exactly.
+- **`E403` / `E404` on publish:** you aren't a member of the `northmatter` npm org, or (in CI) the trusted publisher entry doesn't match the repo or workflow name exactly.

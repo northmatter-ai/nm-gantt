@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { strToU8, zipSync } from 'fflate';
-import { defaultTenantCalendar, formatLocal, parseLocal } from '@northmatter-ai/calendar';
-import { calculate } from '@northmatter-ai/schedule-engine';
-import { evenKeys, toScheduleInput, type ActivityRecord, type LinkRecord, type ScheduleDoc } from '@northmatter-ai/schedule-commands';
+import { defaultTenantCalendar, formatLocal, parseLocal } from '@northmatter/calendar';
+import { calculate } from '@northmatter/schedule-engine';
+import { evenKeys, toScheduleInput, type ActivityRecord, type LinkRecord, type ScheduleDoc } from '@northmatter/schedule-commands';
 import {
   EXCEL_COLUMNS,
   excelTemplate,

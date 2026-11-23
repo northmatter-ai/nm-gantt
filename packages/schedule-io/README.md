@@ -1,4 +1,4 @@
-# @northmatter-ai/schedule-io
+# @northmatter/schedule-io
 
 ## MS Project XML (MSPDI)
 

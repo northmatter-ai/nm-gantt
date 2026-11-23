@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import fc from 'fast-check';
-import { defaultTenantCalendar, parseLocal } from '@northmatter-ai/calendar';
-import { calculate } from '@northmatter-ai/schedule-engine';
+import { defaultTenantCalendar, parseLocal } from '@northmatter/calendar';
+import { calculate } from '@northmatter/schedule-engine';
 import {
   applyCommands,
   childrenOf,

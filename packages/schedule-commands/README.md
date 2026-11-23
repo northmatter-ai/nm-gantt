@@ -1,4 +1,4 @@
-# @northmatter-ai/schedule-commands
+# @northmatter/schedule-commands
 
 The schedule version document (`ScheduleDoc`), conversion to engine input (`toScheduleInput`), and the 12 edit commands from the spec:
 

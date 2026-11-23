@@ -1,5 +1,5 @@
 /** Orthogonal link routing from the correct bar end to the correct bar end for the link type. */
-import type { LinkType } from '@northmatter-ai/schedule-engine';
+import type { LinkType } from '@northmatter/schedule-engine';
 
 const STUB = 8;
 

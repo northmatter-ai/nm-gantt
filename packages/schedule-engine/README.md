@@ -1,4 +1,4 @@
-# @northmatter-ai/schedule-engine
+# @northmatter/schedule-engine
 
 Pure CPM engine: `calculate(input): ScheduleResult` and `compare(current, baseline, keyOf, { calendar })`.
 

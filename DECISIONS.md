@@ -200,7 +200,7 @@ The Planning API needs the same command when it is built.
 *Tests:* `excel.test.ts › matches trades…`, round trip.
 
 ### D-034 Publishing to npm
-The six packages are published as public, MIT-licensed packages under `@northmatter-ai` (it was `@nm`, which we don't own on npm). They release together at one version. See [RELEASING.md](RELEASING.md).
+The six packages are published as public, MIT-licensed packages under `@northmatter`. It was `@nm`, which we don't own on npm. `@northmatter-ai` was the first choice, to match the GitHub org, but npm refused the org name as too similar to the publishing account `northmatter.ai`. The GitHub org stays `northmatter-ai`. They release together at one version. See [RELEASING.md](RELEASING.md).
 - **Build:** plain `tsc` emit to `dist` (ESM + `.d.ts` + source maps, with `src` shipped for the maps), with no bundler. The worker keeps the `new URL('./engine.worker.js', import.meta.url)` form, which every major bundler understands. The build only rewrites `.ts` → `.js` in that URL.
 - **Dev vs published:** `exports` stays on `src` for the workspace. `publishConfig.exports` points at `dist` for the tarball. Sibling packages resolve to each other's `dist` types at build time (`paths` in `tsconfig.build.json`), so no package re-emits another's sources.
 - **No Changesets:** its dev dependencies (`argparse` Python-2.0, `graceful-fs` BlueOak-1.0.0, `spawndamnit` unlicensed) fail the licence allow-list. A small `set-version` script and a `v*` tag trigger do the same job here.

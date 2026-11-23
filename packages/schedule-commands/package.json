@@ -1,5 +1,5 @@
 {
-  "name": "@northmatter-ai/schedule-commands",
+  "name": "@northmatter/schedule-commands",
   "version": "0.1.0",
   "description": "Undoable, validated edit commands for NorthMatter schedules (activities, links, calendars, lookups).",
   "keywords": [
@@ -52,7 +52,7 @@
     "node": ">=18"
   },
   "dependencies": {
-    "@northmatter-ai/calendar": "workspace:*",
-    "@northmatter-ai/schedule-engine": "workspace:*"
+    "@northmatter/calendar": "workspace:*",
+    "@northmatter/schedule-engine": "workspace:*"
   }
 }

@@ -1,4 +1,4 @@
-/* @northmatter-ai/gantt — colours come from CSS variables; light and dark themes; tenant brand via --nm-brand. */
+/* @northmatter/gantt — colours come from CSS variables; light and dark themes; tenant brand via --nm-brand. */
 .nm-gantt {
   --nm-brand: #2f6fde;
   --nm-bg: #ffffff;

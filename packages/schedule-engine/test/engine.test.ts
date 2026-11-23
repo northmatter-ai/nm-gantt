@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { compileCalendar } from '@northmatter-ai/calendar';
+import { compileCalendar } from '@northmatter/calendar';
 import { calculate, compare } from '../src/index.js';
 import { at, DAY, fmt, H, link, ms, schedule, STD, task } from './helpers.js';
 

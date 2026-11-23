@@ -1,16 +1,16 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { formatLocal, instantFromEpochMs, parseLocal } from '@northmatter-ai/calendar';
-import { createUndoHistory, Gantt, PhoneSchedule, type FilterSpec, type GanttHandle, type GroupBy, type Locale, type Zoom } from '@northmatter-ai/gantt';
-import { LineOfBalance, LookAhead, TowerFloorGrid } from '@northmatter-ai/construction-views';
-import { toScheduleInput } from '@northmatter-ai/schedule-commands';
-import { calculate } from '@northmatter-ai/schedule-engine';
-import { excelTemplate, exportExcel, exportMspdi, importExcel, importMspdi } from '@northmatter-ai/schedule-io';
+import { formatLocal, instantFromEpochMs, parseLocal } from '@northmatter/calendar';
+import { createUndoHistory, Gantt, PhoneSchedule, type FilterSpec, type GanttHandle, type GroupBy, type Locale, type Zoom } from '@northmatter/gantt';
+import { LineOfBalance, LookAhead, TowerFloorGrid } from '@northmatter/construction-views';
+import { toScheduleInput } from '@northmatter/schedule-commands';
+import { calculate } from '@northmatter/schedule-engine';
+import { excelTemplate, exportExcel, exportMspdi, importExcel, importMspdi } from '@northmatter/schedule-io';
 import { MockPlanningServer, type ServerState } from './mockServer';
 import { blankProject, calendars, FLOOR_TEMPLATES, largeSchedule, sampleSchedule, stressTower, withProgress } from './sample';
 import { ImportDialog, type PendingImport } from './ImportDialog';
 import { NewProjectDialog, type NewProjectInput } from './NewProjectDialog';
 import { listProjects, newProjectId, projectSource, projectStorageKey, removeProjectData, saveProjects, STORAGE, type ProjectEntry } from './projects';
-import type { ScheduleDoc } from '@northmatter-ai/schedule-commands';
+import type { ScheduleDoc } from '@northmatter/schedule-commands';
 import { mockSite } from './siteMock';
 
 /** 'sample' | 'large' | 'tower40' | `p:<project id>` */

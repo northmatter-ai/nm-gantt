@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import type { ImportReport } from '@northmatter-ai/schedule-io';
+import type { ImportReport } from '@northmatter/schedule-io';
 
 export interface PendingImport {
   fileName: string;

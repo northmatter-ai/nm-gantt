@@ -11,7 +11,7 @@ Read this before changing anything. It says what exists, where it lives, the rul
 | **Licences** | Dependencies must be MIT, Apache-2.0, BSD-2/3-Clause or ISC. `node scripts/check-licenses.mjs` enforces this. An SPDX `OR` passes if any branch is allowed. The only exception is `caniuse-lite`, a dev-only tool listed in `scripts/license-exceptions.json`, and it still awaits sign-off (D-012). Check a new dependency's **whole tree** before adding it; that is why ExcelJS was rejected (D-028). |
 | **Clean room** | Never copy or port code from commercial Gantt products (Bryntum, DHTMLX, …) or from GPL code. Write from public specs (ECMA-376, the MSPDI schema) and from the build spec. |
 | **TypeScript strict** | All 7 packages. `pnpm typecheck` must pass. |
-| **Pure engine** | `@northmatter-ai/calendar` and `@northmatter-ai/schedule-engine` have no I/O and no runtime dependencies, and use no `Date.now()`. All times are **integer minutes**, and ties are broken by id, so results are deterministic. |
+| **Pure engine** | `@northmatter/calendar` and `@northmatter/schedule-engine` have no I/O and no runtime dependencies, and use no `Date.now()`. All times are **integer minutes**, and ties are broken by id, so results are deterministic. |
 | **Every rule has a test** | A behaviour you add or change needs a unit test named after the rule. Anything visible in the UI also needs a Playwright test. |
 | **Interpretations go in DECISIONS.md** | The next free number is **D-034**. Each entry names the test that pins it. |
 | **Git** | The folder is **not a git repository** yet. Don't commit unless the user asks. |
@@ -35,13 +35,13 @@ The dependencies run one way: `calendar` ← `schedule-engine` ← `schedule-com
 
 ## 3. What is built, package by package
 
-### `@northmatter-ai/calendar` (M1, done)
+### `@northmatter/calendar` (M1, done)
 - `src/calendar.ts` provides `compileCalendar(s)`, `nextWorkStart`, `prevWorkEnd`, `finishFrom`, `startFrom`, `workBetween`, `shift`, `ELAPSED` and `defaultTenantCalendar(id, holidays)` (Mon–Sat, 8 h, Asia/Kolkata).
 - `src/dates.ts` and `src/zone.ts` handle local dates via `Intl` with per-day offset caching (D-001). Helpers: `parseLocal(tz, 'YYYY-MM-DDTHH:MM')`, `formatLocal`, `instantToLocal`, `dayStartInstant`, `isoToDay`/`dayToIso` (days since 1970-01-01), `weekdayOfDay` (0 = Sunday) and `instantFromEpochMs`.
 - Calendars support inheritance (`baseId`), exceptions and IANA zones.
 - Tests: 54, including the performance target (100k `finishFrom` in under 150 ms, best of 3 runs).
 
-### `@northmatter-ai/schedule-engine` (M2–M4, done in code but not yet verified against MS Project)
+### `@northmatter/schedule-engine` (M2–M4, done in code but not yet verified against MS Project)
 - `calculate(input) → ScheduleResult` **never throws**. On a bad schedule it returns `ok: false` with `errors`.
 - It covers:
   - validation (Tarjan cycle detection), Kahn ordering, and the forward and backward passes;
@@ -53,7 +53,7 @@ The dependencies run one way: `calendar` ← `schedule-engine` ← `schedule-com
 - `ActivityResult` fields: `es ef ls lf totalFloat freeFloat isCritical isLongestPath drivingLinkIds drivingPredecessorIds remainingStart? remaining? status`.
 - Tests: 48 unit and 8 property tests (spec properties 1–7). 10k activities and 20k links calculate in under 500 ms.
 
-### `@northmatter-ai/schedule-commands`
+### `@northmatter/schedule-commands`
 - `model.ts`:
   - `ScheduleDoc`: id, name, kind, version, projectStart, dataDate, defaultCalendarId, calendars, activities, links, settings, towers?, floors?, floorOrder?, templates?.
   - `ActivityRecord`: adds stableKey, code, name, sortKey, tower/floor ids, notes, externalRef and `autoSummary?` (D-027).
@@ -66,7 +66,7 @@ The dependencies run one way: `calendar` ← `schedule-engine` ← `schedule-com
 - `sortKey.ts` has fractional sibling keys (`keyBetween`, `evenKeys`, `keysAfter`).
 - `text.ts` has `parseDuration`/`formatDuration` ("5d", "4h", "2w") and `parsePredecessors`/`formatPredecessor` ("12FS+2d; 15SS").
 
-### `@northmatter-ai/schedule-io` (M5, partly done)
+### `@northmatter/schedule-io` (M5, partly done)
 - `mspdi.ts`: `importMspdi(xml, opts) → { doc, result, report }` and `exportMspdi(doc, result)`. The report has `unmapped`, `conversions`, `errors`, `warnings` and `counts`, and **is** the dry run. Codes still to verify against the schema are listed in D-017.
 - `excel.ts`:
   - **Import:** `importExcel(bytes, { calendars, defaultCalendarId, projectStart, … })`, plus `importExcelSheets` (pure, used by the tests).
@@ -76,7 +76,7 @@ The dependencies run one way: `calendar` ← `schedule-engine` ← `schedule-com
 - `links.ts` holds `resolveLinks`, the spec's rule for links to summaries, shared by both formats.
 - Tests: 7 MSPDI and 23 Excel. Generated files were checked with openpyxl but **not yet in real Excel**.
 
-### `@northmatter-ai/gantt` (M6–M7, done)
+### `@northmatter/gantt` (M6–M7, done)
 - **`Gantt.tsx`:** `<Gantt version mode="edit|view|print" zoom groupBy filter showBaselineId onCommands …/>`.
   - The component holds no business rules. Each user action becomes `Command[]`, the engine previews it in a Web Worker (`engine.worker.ts`, `usePreview.ts`), and then `onCommands` sends it. The server's result always wins.
   - `GanttHandle`: `undo`, `redo`, `canUndo`, `canRedo`, `scrollToDate`, `addActivity`, `expandAll`, `collapseAll`, `focusActivity` and `openSetup`.
@@ -95,7 +95,7 @@ The dependencies run one way: `calendar` ← `schedule-engine` ← `schedule-com
   - Pinch, swipe, −/+/Fit, and tap for a details sheet (D-031). `buildPhoneList` is pure.
 - Tests: 12 helper, 8 phone and 3 setup tests. The 5,000-activity schedule renders in about 125 ms headless.
 
-### `@northmatter-ai/construction-views` (M8, partly done)
+### `@northmatter/construction-views` (M8, partly done)
 - `TowerFloorGrid`, `LineOfBalance`, `LookAhead` (with PPC and browser print-to-PDF) and `ActivityDetails`.
 - The models live in `model.ts`: `SiteData`, `cellState`, `buildTowerGrid`, `buildLob` and `buildLookahead`. Rules: D-020 to D-025.
 - They run on **mock Site data** (`apps/demo/src/siteMock.ts`). The `SiteData` shape still needs confirming with the Site team.

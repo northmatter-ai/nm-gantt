@@ -1,7 +1,7 @@
 /** Sample schedules: a two-tower residential project with real logic, and a 5,000-activity stress schedule. */
-import { compileCalendars, defaultTenantCalendar, parseLocal, type CalendarInput, type Minutes } from '@northmatter-ai/calendar';
-import { evenKeys, type ActivityRecord, type LinkRecord, type ScheduleDoc } from '@northmatter-ai/schedule-commands';
-import type { LinkType } from '@northmatter-ai/schedule-engine';
+import { compileCalendars, defaultTenantCalendar, parseLocal, type CalendarInput, type Minutes } from '@northmatter/calendar';
+import { evenKeys, type ActivityRecord, type LinkRecord, type ScheduleDoc } from '@northmatter/schedule-commands';
+import type { LinkType } from '@northmatter/schedule-engine';
 
 const TZ = 'Asia/Kolkata';
 const at = (s: string) => parseLocal(TZ, s);

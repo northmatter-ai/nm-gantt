@@ -1,4 +1,4 @@
-import type { CompiledCalendar } from '@northmatter-ai/calendar';
+import type { CompiledCalendar } from '@northmatter/calendar';
 import type { ScheduleResult, Variance } from './types.js';
 
 export interface CompareOptions {

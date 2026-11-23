@@ -3,9 +3,9 @@
  * construction order, each cell the activity for that floor and template, coloured and patterned by state.
  */
 import { memo, useMemo, useState } from 'react';
-import type { BaselineView, ScheduleDoc } from '@northmatter-ai/schedule-commands';
-import type { ScheduleResult } from '@northmatter-ai/schedule-engine';
-import { fmtDate } from '@northmatter-ai/gantt';
+import type { BaselineView, ScheduleDoc } from '@northmatter/schedule-commands';
+import type { ScheduleResult } from '@northmatter/schedule-engine';
+import { fmtDate } from '@northmatter/gantt';
 import { buildTowerGrid, CELL_STATES, towersOf, type SiteData } from './model.js';
 import { ActivityDetails } from './ActivityDetails.js';
 import { StateIcon } from './StateIcon.js';

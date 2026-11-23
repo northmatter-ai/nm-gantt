@@ -3,8 +3,8 @@
  * list drives undo/redo, the audit log and the server. Applying a command returns the new
  * document and the inverse commands that undo it.
  */
-import type { Minutes } from '@northmatter-ai/calendar';
-import type { ConstraintType } from '@northmatter-ai/schedule-engine';
+import type { Minutes } from '@northmatter/calendar';
+import type { ConstraintType } from '@northmatter/schedule-engine';
 import type { ActivityRecord, LinkRecord, ScheduleDoc } from './model.js';
 import { keyBetween } from './sortKey.js';
 
