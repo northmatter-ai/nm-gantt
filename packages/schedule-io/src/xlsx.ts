@@ -101,7 +101,8 @@ function sheetXml(s: WriteSheet): string {
 }
 
 /** Build an .xlsx file. Sheet names are trimmed to Excel's 31-character limit. */
-export function writeXlsx(sheets: WriteSheet[]): Uint8Array {
+/** Returns bytes backed by a plain ArrayBuffer, so `new Blob([bytes])` type-checks on TS 5.7+. */
+export function writeXlsx(sheets: WriteSheet[]): Uint8Array<ArrayBuffer> {
   const names = sheets.map((s) => s.name.replace(/[[\]:*?/\\]/g, ' ').slice(0, 31) || 'Sheet');
   const files: Record<string, Uint8Array> = {
     '[Content_Types].xml': strToU8(`<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
@@ -116,7 +117,8 @@ export function writeXlsx(sheets: WriteSheet[]): Uint8Array {
   };
   sheets.forEach((s, i) => { files[`xl/worksheets/sheet${i + 1}.xml`] = strToU8(sheetXml(s)); });
   // Fixed timestamp keeps output byte-identical for the same input.
-  return zipSync(files, { level: 6, mtime: new Date(Date.UTC(2020, 0, 1)) });
+  // fflate always allocates a fresh ArrayBuffer; its typings just say ArrayBufferLike.
+  return zipSync(files, { level: 6, mtime: new Date(Date.UTC(2020, 0, 1)) }) as Uint8Array<ArrayBuffer>;
 }
 
 // ------------------------------------------------------------------ read

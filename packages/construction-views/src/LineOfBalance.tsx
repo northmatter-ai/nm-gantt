@@ -4,6 +4,7 @@
  */
 import { useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { fmtDate, ticks, type Scale, type Zoom } from '@northmatter-ai/gantt';
+import { axisLabels } from './axis.js';
 import type { BaselineView, ScheduleDoc } from '@northmatter-ai/schedule-commands';
 import type { ScheduleResult } from '@northmatter-ai/schedule-engine';
 import { buildLob, templatesOf, towersOf, type LobLine, type SiteData } from './model.js';
@@ -126,13 +127,11 @@ export function LineOfBalance({ doc, results, site, towerId: towerProp, baseline
             onMouseLeave={() => setHover(null)}>
             {/* time header, two tiers */}
             <g className="nmc-axis">
-              {header.top.map((tk) => <text key={tk.key} x={M.left + Math.max(0, tk.x) + 4} y={16} className="nmc-axis-top">{tk.label}</text>)}
-              {header.bottom.map((tk) => (
-                <g key={tk.key}>
-                  <line x1={M.left + tk.x} x2={M.left + tk.x} y1={22} y2={M.top + plotH} className="nmc-gridline" />
-                  {tk.w > 28 && <text x={M.left + tk.x + 4} y={38}>{tk.label}</text>}
-                </g>
+              {axisLabels(header.top, plotW, { pin: true, charW: 7 }).map((l) => <text key={l.key} x={M.left + l.x} y={16} className="nmc-axis-top">{l.label}</text>)}
+              {header.bottom.filter((tk) => tk.x >= 0).map((tk) => (
+                <line key={tk.key} x1={M.left + tk.x} x2={M.left + tk.x} y1={22} y2={M.top + plotH} className="nmc-gridline" />
               ))}
+              {axisLabels(header.bottom, plotW).map((l) => <text key={l.key} x={M.left + l.x} y={38}>{l.label}</text>)}
             </g>
             {/* floors */}
             <g className="nmc-axis">

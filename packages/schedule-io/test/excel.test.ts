@@ -364,3 +364,9 @@ describe('Excel template', () => {
     expect(doc.activities.find((a) => a.code === 'TA-F01-SLAB')).toMatchObject({ activityTemplateId: 'TR-SLAB' });
   });
 });
+
+// Compile-time guard: the exported bytes must be usable as a BlobPart under TS 5.7+ lib typings.
+it('export bytes are typed as a plain ArrayBuffer view (usable in new Blob)', () => {
+  const bytes: Uint8Array<ArrayBuffer> = excelTemplate();
+  expect(bytes.buffer).toBeInstanceOf(ArrayBuffer);
+});

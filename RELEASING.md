@@ -34,7 +34,7 @@ The six packages in `packages/` are published to npm as public MIT packages unde
 2. **npm org.** On npmjs.com: avatar → *Add Organization* → name **`northmatter-ai`** → *Unlimited public packages* (free). Invite other maintainers under *Members*.
 3. **First publish (by hand, from your machine).** npm trusted publishing can only be set up for a package that already exists, so the first release goes from a laptop:
    ```bash
-   git checkout main && git pull
+   git checkout master && git pull
    pnpm install
    pnpm release:dry                 # builds, checks tarballs, dry-run publish
    pnpm release                     # full CI, then publishes all six (asks for your 2FA code)
@@ -52,14 +52,14 @@ The six packages in `packages/` are published to npm as public MIT packages unde
 ## Every release after the first
 
 ```bash
-git checkout main && git pull
+git checkout master && git pull
 pnpm set-version 0.2.0          # bumps all six packages
 # add a "## 0.2.0" section to CHANGELOG.md
 pnpm install                    # refreshes the lockfile
 pnpm release:dry                # optional local check
 git commit -am "Release 0.2.0"
 git tag v0.2.0
-git push origin main v0.2.0     # the tag starts the Release workflow
+git push origin master v0.2.0     # the tag starts the Release workflow
 ```
 
 The workflow:

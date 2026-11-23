@@ -519,7 +519,7 @@ function instructionsSheet(): WriteSheet {
 }
 
 /** Write a schedule as the Excel template, with calculated dates and float alongside. */
-export function exportExcel(doc: ScheduleDoc, result?: ScheduleResult): Uint8Array {
+export function exportExcel(doc: ScheduleDoc, result?: ScheduleResult): Uint8Array<ArrayBuffer> {
   const tz = doc.calendars.find((c) => c.id === doc.defaultCalendarId)?.timeZone ?? 'Asia/Kolkata';
   const hpdOf = (id: string | undefined) => doc.calendars.find((c) => c.id === (id ?? doc.defaultCalendarId))?.hoursPerDay ?? 480;
   const calName = (id: string | undefined) => (id ? doc.calendars.find((c) => c.id === id)?.name ?? id : '');
@@ -586,7 +586,7 @@ export function exportExcel(doc: ScheduleDoc, result?: ScheduleResult): Uint8Arr
 }
 
 /** A blank template with a few example rows, for planners starting in Excel. */
-export function excelTemplate(projectStartIso?: string): Uint8Array {
+export function excelTemplate(projectStartIso?: string): Uint8Array<ArrayBuffer> {
   const rows: CellValue[][] = [
     [...EXCEL_COLUMNS, EXCEL_TRADE_COLUMN],
     ['1', 'TA', 'Tower A', 'Summary', null, '', '', '', null, 'Tower A', '', null, null, null, ''],
