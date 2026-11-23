@@ -1,6 +1,6 @@
 {
   "name": "@northmatter/schedule-commands",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Undoable, validated edit commands for NorthMatter schedules (activities, links, calendars, lookups).",
   "keywords": [
     "scheduling",
@@ -38,7 +38,8 @@
     "exports": {
       ".": {
         "types": "./dist/index.d.ts",
-        "import": "./dist/index.js"
+        "import": "./dist/index.js",
+        "default": "./dist/index.js"
       }
     },
     "main": "./dist/index.js",

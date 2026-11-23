@@ -1,6 +1,6 @@
 {
   "name": "@northmatter/calendar",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Working-time calendars for NorthMatter scheduling: work weeks, holidays and exceptions, minute-precise duration arithmetic.",
   "keywords": [
     "scheduling",
@@ -38,7 +38,8 @@
     "exports": {
       ".": {
         "types": "./dist/index.d.ts",
-        "import": "./dist/index.js"
+        "import": "./dist/index.js",
+        "default": "./dist/index.js"
       }
     },
     "main": "./dist/index.js",
