@@ -1,4 +1,4 @@
-import { defaultTenantCalendar, formatLocal, parseLocal, type CalendarInput } from '@northmatter-ai/calendar';
+import { defaultTenantCalendar, formatLocal, parseLocal, type CalendarInput } from '@northmatter/calendar';
 import type { ActivityInput, LinkInput, LinkType, ScheduleInput } from '../src/index.js';
 
 export const TZ = 'Asia/Kolkata';

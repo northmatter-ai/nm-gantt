@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import { defaultTenantCalendar, parseLocal } from '@northmatter-ai/calendar';
-import { calculate } from '@northmatter-ai/schedule-engine';
-import { makeBaseline, toScheduleInput, type ActivityRecord, type LinkRecord, type ScheduleDoc } from '@northmatter-ai/schedule-commands';
+import { defaultTenantCalendar, parseLocal } from '@northmatter/calendar';
+import { calculate } from '@northmatter/schedule-engine';
+import { makeBaseline, toScheduleInput, type ActivityRecord, type LinkRecord, type ScheduleDoc } from '@northmatter/schedule-commands';
 import { buildLob, buildLookahead, buildTowerGrid, cellState, floorsOf } from '../src/model.js';
 
 const TZ = 'Asia/Kolkata';

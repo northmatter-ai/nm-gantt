@@ -3,9 +3,9 @@
  * summary goes to each child with no predecessor inside that summary; a link out of a summary goes from each
  * child with no successor inside it. Every conversion is logged.
  */
-import type { Minutes } from '@northmatter-ai/calendar';
-import type { LinkType } from '@northmatter-ai/schedule-engine';
-import type { ActivityRecord, LinkRecord } from '@northmatter-ai/schedule-commands';
+import type { Minutes } from '@northmatter/calendar';
+import type { LinkType } from '@northmatter/schedule-engine';
+import type { ActivityRecord, LinkRecord } from '@northmatter/schedule-commands';
 
 export interface PendingLink {
   from: ActivityRecord;

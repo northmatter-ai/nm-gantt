@@ -1,5 +1,5 @@
 {
-  "name": "@northmatter-ai/construction-views",
+  "name": "@northmatter/construction-views",
   "version": "0.1.0",
   "description": "Construction views for NorthMatter schedules: tower × floor grid, line of balance and look-ahead.",
   "keywords": [
@@ -54,10 +54,10 @@
     "node": ">=18"
   },
   "dependencies": {
-    "@northmatter-ai/calendar": "workspace:*",
-    "@northmatter-ai/gantt": "workspace:*",
-    "@northmatter-ai/schedule-commands": "workspace:*",
-    "@northmatter-ai/schedule-engine": "workspace:*"
+    "@northmatter/calendar": "workspace:*",
+    "@northmatter/gantt": "workspace:*",
+    "@northmatter/schedule-commands": "workspace:*",
+    "@northmatter/schedule-engine": "workspace:*"
   },
   "peerDependencies": {
     "react": "^18.3.0 || ^19.0.0"

@@ -16,8 +16,8 @@ import {
   type CalendarInput,
   type CompiledCalendar,
   type Minutes,
-} from '@northmatter-ai/calendar';
-import { calculate, type ActivityType, type ConstraintType, type ScheduleResult } from '@northmatter-ai/schedule-engine';
+} from '@northmatter/calendar';
+import { calculate, type ActivityType, type ConstraintType, type ScheduleResult } from '@northmatter/schedule-engine';
 import {
   evenKeys,
   formatDuration,
@@ -27,7 +27,7 @@ import {
   toScheduleInput,
   type ActivityRecord,
   type ScheduleDoc,
-} from '@northmatter-ai/schedule-commands';
+} from '@northmatter/schedule-commands';
 import { resolveLinks, type PendingLink } from './links.js';
 import type { ImportReport, ImportResult } from './mspdi.js';
 import { readXlsx, writeXlsx, type CellValue, type SheetData, type WriteSheet } from './xlsx.js';

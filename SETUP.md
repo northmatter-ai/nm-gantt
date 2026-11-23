@@ -91,7 +91,7 @@ Projects made with **+ New project → Tower schedule** come with all three alre
 | `pnpm dev` | Development server with hot reload | http://localhost:3600 |
 | `pnpm preview` | Production build, then serves it (closest to what users get) | http://localhost:3600 |
 | `pnpm build` | Production build only, into `apps/demo/dist/` (static files; host on any web server) | — |
-| `pnpm --filter @northmatter-ai/gantt-demo exec vite --port 3600 --host` | Dev server reachable from other devices on your network (e.g. to try it on a phone or tablet) | http://\<your-ip\>:3600 |
+| `pnpm --filter @northmatter/gantt-demo exec vite --port 3600 --host` | Dev server reachable from other devices on your network (e.g. to try it on a phone or tablet) | http://\<your-ip\>:3600 |
 
 ## 4. Run the checks
 
@@ -119,7 +119,7 @@ SHOT_DIR=/tmp/shots pnpm e2e
 
 | Problem | Fix |
 |---|---|
-| `Port 3600 is in use` | Something else is on 3600, perhaps another `pnpm dev`. Stop it, or run `pnpm --filter @northmatter-ai/gantt-demo exec vite --port 3601`. |
+| `Port 3600 is in use` | Something else is on 3600, perhaps another `pnpm dev`. Stop it, or run `pnpm --filter @northmatter/gantt-demo exec vite --port 3601`. |
 | `ERR_PNPM_IGNORED_BUILDS … esbuild` | You're on an older pnpm that ignores `allowBuilds`. Run `corepack enable`, then reinstall. Or run `pnpm approve-builds` and approve esbuild. |
 | `Unsupported engine` / syntax errors on start | Node is older than 22. Run `nvm use 22` (or install Node 22+). |
 | The sample looks wrong or old after code changes | Edits persist in `localStorage`. Click **Reset** in the toolbar, or run `localStorage.clear()` in the browser console and reload. |

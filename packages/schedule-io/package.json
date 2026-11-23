@@ -1,5 +1,5 @@
 {
-  "name": "@northmatter-ai/schedule-io",
+  "name": "@northmatter/schedule-io",
   "version": "0.1.0",
   "description": "Import and export NorthMatter schedules as MS Project XML (MSPDI) and Excel (.xlsx).",
   "keywords": [
@@ -52,9 +52,9 @@
     "node": ">=18"
   },
   "dependencies": {
-    "@northmatter-ai/calendar": "workspace:*",
-    "@northmatter-ai/schedule-commands": "workspace:*",
-    "@northmatter-ai/schedule-engine": "workspace:*",
+    "@northmatter/calendar": "workspace:*",
+    "@northmatter/schedule-commands": "workspace:*",
+    "@northmatter/schedule-engine": "workspace:*",
     "fast-xml-parser": "^4.5.1",
     "fflate": "0.8.2"
   }

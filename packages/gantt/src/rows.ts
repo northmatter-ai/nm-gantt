@@ -1,6 +1,6 @@
 /** Flatten the WBS tree into visible rows, applying collapse state, filters and grouping. */
-import type { ActivityRecord, ScheduleDoc } from '@northmatter-ai/schedule-commands';
-import type { ActivityResult, ScheduleResult } from '@northmatter-ai/schedule-engine';
+import type { ActivityRecord, ScheduleDoc } from '@northmatter/schedule-commands';
+import type { ActivityResult, ScheduleResult } from '@northmatter/schedule-engine';
 import type { FilterSpec, GroupBy } from './types.js';
 
 export interface Row {

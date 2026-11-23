@@ -1,5 +1,5 @@
 {
-  "name": "@northmatter-ai/gantt",
+  "name": "@northmatter/gantt",
   "version": "0.1.0",
   "description": "React Gantt chart with drag-and-stretch editing, live CPM preview in a Web Worker, and a phone view.",
   "keywords": [
@@ -55,9 +55,9 @@
     "node": ">=18"
   },
   "dependencies": {
-    "@northmatter-ai/calendar": "workspace:*",
-    "@northmatter-ai/schedule-commands": "workspace:*",
-    "@northmatter-ai/schedule-engine": "workspace:*",
+    "@northmatter/calendar": "workspace:*",
+    "@northmatter/schedule-commands": "workspace:*",
+    "@northmatter/schedule-engine": "workspace:*",
     "@tanstack/react-virtual": "^3.11.2"
   },
   "peerDependencies": {

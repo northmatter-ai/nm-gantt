@@ -48,7 +48,7 @@ for (const entry of readdirSync(store)) {
       if (!existsSync(file)) continue;
       let pkg;
       try { pkg = JSON.parse(readFileSync(file, 'utf8')); } catch { continue; }
-      if (!pkg.name || !pkg.version || pkg.name.startsWith('@northmatter-ai/')) continue;
+      if (!pkg.name || !pkg.version || pkg.name.startsWith('@northmatter/')) continue;
       seen.set(`${pkg.name}@${pkg.version}`, licenceOf(pkg));
     }
   }

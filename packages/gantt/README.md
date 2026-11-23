@@ -1,4 +1,4 @@
-# @northmatter-ai/gantt
+# @northmatter/gantt
 
 React Gantt chart: a tree grid and an SVG timeline sharing one vertical scroll, virtualised with `@tanstack/react-virtual`.
 
@@ -25,12 +25,12 @@ React Gantt chart: a tree grid and an SVG timeline sharing one vertical scroll, 
 | Shift+wheel | Horizontal scroll |
 | Right-click | Context menu |
 
-Import `@northmatter-ai/gantt/gantt.css`. Theme it with CSS variables on `.nm-gantt`. Dark mode follows `prefers-color-scheme`, or set `data-theme="dark"|"light"` on `<html>`.
+Import `@northmatter/gantt/gantt.css`. Theme it with CSS variables on `.nm-gantt`. Dark mode follows `prefers-color-scheme`, or set `data-theme="dark"|"light"` on `<html>`.
 
 ## Phone view
 
 ```tsx
-import { PhoneSchedule } from '@northmatter-ai/gantt';
+import { PhoneSchedule } from '@northmatter/gantt';
 <PhoneSchedule version={{ doc, results, baselines }} initialScope={{ kind: 'lookahead', weeks: 3 }} showBaselineId="bl-1" locale="hi" />
 ```
 

@@ -8,6 +8,6 @@
     "declaration": true,
     "declarationMap": true,
     "sourceMap": true,
-    "paths": { "@northmatter-ai/*": ["./packages/*/dist/index.d.ts"] }
+    "paths": { "@northmatter/*": ["./packages/*/dist/index.d.ts"] }
   }
 }

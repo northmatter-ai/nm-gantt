@@ -1,5 +1,5 @@
 {
-  "name": "@northmatter-ai/calendar",
+  "name": "@northmatter/calendar",
   "version": "0.1.0",
   "description": "Working-time calendars for NorthMatter scheduling: work weeks, holidays and exceptions, minute-precise duration arithmetic.",
   "keywords": [

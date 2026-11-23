@@ -3,10 +3,10 @@
  * each floor; plan solid, actual (certified) dashed in the same colour. Crossing lines are clashes.
  */
 import { useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { fmtDate, ticks, type Scale, type Zoom } from '@northmatter-ai/gantt';
+import { fmtDate, ticks, type Scale, type Zoom } from '@northmatter/gantt';
 import { axisLabels } from './axis.js';
-import type { BaselineView, ScheduleDoc } from '@northmatter-ai/schedule-commands';
-import type { ScheduleResult } from '@northmatter-ai/schedule-engine';
+import type { BaselineView, ScheduleDoc } from '@northmatter/schedule-commands';
+import type { ScheduleResult } from '@northmatter/schedule-engine';
 import { buildLob, templatesOf, towersOf, type LobLine, type SiteData } from './model.js';
 import { vt } from './i18n.js';
 

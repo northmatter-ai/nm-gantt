@@ -1,5 +1,5 @@
 /**
- * @northmatter-ai/gantt — grid on the left, timeline on the right, one vertical scroll.
+ * @northmatter/gantt — grid on the left, timeline on the right, one vertical scroll.
  * Holds no business rules: user actions become commands, previewed by the engine in a Web Worker,
  * then sent through onCommands; the server's result always wins.
  */
@@ -18,8 +18,8 @@ import {
   type PointerEvent as ReactPointerEvent,
 } from 'react';
 import { useVirtualizer } from '@tanstack/react-virtual';
-import { compileCalendars, dayToIso, ELAPSED, instantFromEpochMs, parseLocal, type CompiledCalendar, type Minutes } from '@northmatter-ai/calendar';
-import type { LinkType, ScheduleResult } from '@northmatter-ai/schedule-engine';
+import { compileCalendars, dayToIso, ELAPSED, instantFromEpochMs, parseLocal, type CompiledCalendar, type Minutes } from '@northmatter/calendar';
+import type { LinkType, ScheduleResult } from '@northmatter/schedule-engine';
 import {
   applyCommands,
   childrenOf,
@@ -37,7 +37,7 @@ import {
   type Command,
   type LinkRecord,
   type ScheduleDoc,
-} from '@northmatter-ai/schedule-commands';
+} from '@northmatter/schedule-commands';
 import { ActivityEditor, LinkEditor } from './ActivityEditor.js';
 import { ProjectSetup } from './ProjectSetup.js';
 import { ContextMenu, Legend, type MenuItem } from './Chrome.js';

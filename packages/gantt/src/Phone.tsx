@@ -4,9 +4,9 @@
  */
 import { useEffect, useMemo, useRef, useState, type PointerEvent as RPointerEvent } from 'react';
 import { useVirtualizer } from '@tanstack/react-virtual';
-import { dayStartInstant, instantToLocal, ymdToDay, type Minutes } from '@northmatter-ai/calendar';
-import type { ActivityRecord, ScheduleVersionView } from '@northmatter-ai/schedule-commands';
-import type { ActivityResult } from '@northmatter-ai/schedule-engine';
+import { dayStartInstant, instantToLocal, ymdToDay, type Minutes } from '@northmatter/calendar';
+import type { ActivityRecord, ScheduleVersionView } from '@northmatter/schedule-commands';
+import type { ActivityResult } from '@northmatter/schedule-engine';
 import { fmtDate, formatDuration } from './format.js';
 import { translator, type Translate } from './i18n.js';
 import { buildPhoneList, LOOKAHEAD_WEEKS, shortDate, weekStart, zoomWindow, type PhoneItem, type PhoneScope } from './phoneModel.js';

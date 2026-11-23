@@ -1,6 +1,6 @@
-import type { Minutes } from '@northmatter-ai/calendar';
-import type { Command, ScheduleDoc, ScheduleVersionView } from '@northmatter-ai/schedule-commands';
-import type { ScheduleResult } from '@northmatter-ai/schedule-engine';
+import type { Minutes } from '@northmatter/calendar';
+import type { Command, ScheduleDoc, ScheduleVersionView } from '@northmatter/schedule-commands';
+import type { ScheduleResult } from '@northmatter/schedule-engine';
 
 export type Zoom = 'day' | 'week' | 'month' | 'quarter' | 'year';
 export type GroupBy = 'none' | 'tower' | 'floor' | 'wbs';

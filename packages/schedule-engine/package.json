@@ -1,5 +1,5 @@
 {
-  "name": "@northmatter-ai/schedule-engine",
+  "name": "@northmatter/schedule-engine",
   "version": "0.1.0",
   "description": "CPM scheduling engine: forward/backward pass, constraints, float and critical path, MS Project-compatible.",
   "keywords": [
@@ -52,6 +52,6 @@
     "node": ">=18"
   },
   "dependencies": {
-    "@northmatter-ai/calendar": "workspace:*"
+    "@northmatter/calendar": "workspace:*"
   }
 }

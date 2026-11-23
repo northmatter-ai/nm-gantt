@@ -1,6 +1,6 @@
 /** Towers, floors and trades for the whole project: add, rename, reorder, remove unused. One undoable command. */
 import { useMemo, useState } from 'react';
-import { cmd, lookupId, type Command, type LookupsPatch, type ScheduleDoc } from '@northmatter-ai/schedule-commands';
+import { cmd, lookupId, type Command, type LookupsPatch, type ScheduleDoc } from '@northmatter/schedule-commands';
 import { floorOptions } from './ActivityEditor.js';
 import type { Translate } from './i18n.js';
 

@@ -1,4 +1,4 @@
-# Publishes all @northmatter-ai/* packages to npm when a version tag (v1.2.3) is pushed.
+# Publishes all @northmatter/* packages to npm when a version tag (v1.2.3) is pushed.
 # Uses npm trusted publishing (OIDC): no NPM_TOKEN secret. Each package must list this
 # repository and workflow file (release.yml) as a trusted publisher on npmjs.com.
 # Versions with a pre-release suffix (v0.2.0-beta.1) go to the `next` dist-tag, not `latest`.

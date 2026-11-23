@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { applyCommands, type ScheduleDoc } from '@northmatter-ai/schedule-commands';
-import { defaultTenantCalendar } from '@northmatter-ai/calendar';
+import { applyCommands, type ScheduleDoc } from '@northmatter/schedule-commands';
+import { defaultTenantCalendar } from '@northmatter/calendar';
 import { floorOptions, tradeOptions } from '../src/ActivityEditor.js';
 import { setupCommand } from '../src/ProjectSetup.js';
 

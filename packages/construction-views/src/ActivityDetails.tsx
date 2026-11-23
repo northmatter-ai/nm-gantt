@@ -1,9 +1,9 @@
 /** Activity panel opened from a grid cell: dates, float, inspections and latest DPR photos from Site. */
 import { useEffect, useRef } from 'react';
-import { compileCalendars, type CompiledCalendar } from '@northmatter-ai/calendar';
-import { fmtDate } from '@northmatter-ai/gantt';
-import { formatDuration, type BaselineView, type ScheduleDoc } from '@northmatter-ai/schedule-commands';
-import type { ScheduleResult } from '@northmatter-ai/schedule-engine';
+import { compileCalendars, type CompiledCalendar } from '@northmatter/calendar';
+import { fmtDate } from '@northmatter/gantt';
+import { formatDuration, type BaselineView, type ScheduleDoc } from '@northmatter/schedule-commands';
+import type { ScheduleResult } from '@northmatter/schedule-engine';
 import { cellState, type SiteData } from './model.js';
 import { StateIcon } from './StateIcon.js';
 import type { VT } from './i18n.js';

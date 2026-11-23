@@ -193,22 +193,22 @@ importers:
 
   apps/demo:
     dependencies:
-      '@northmatter-ai/calendar':
+      '@northmatter/calendar':
         specifier: workspace:*
         version: link:../../packages/calendar
-      '@northmatter-ai/construction-views':
+      '@northmatter/construction-views':
         specifier: workspace:*
         version: link:../../packages/construction-views
-      '@northmatter-ai/gantt':
+      '@northmatter/gantt':
         specifier: workspace:*
         version: link:../../packages/gantt
-      '@northmatter-ai/schedule-commands':
+      '@northmatter/schedule-commands':
         specifier: workspace:*
         version: link:../../packages/schedule-commands
-      '@northmatter-ai/schedule-engine':
+      '@northmatter/schedule-engine':
         specifier: workspace:*
         version: link:../../packages/schedule-engine
-      '@northmatter-ai/schedule-io':
+      '@northmatter/schedule-io':
         specifier: workspace:*
         version: link:../../packages/schedule-io
       react:
@@ -235,16 +235,16 @@ importers:
 
   packages/construction-views:
     dependencies:
-      '@northmatter-ai/calendar':
+      '@northmatter/calendar':
         specifier: workspace:*
         version: link:../calendar
-      '@northmatter-ai/gantt':
+      '@northmatter/gantt':
         specifier: workspace:*
         version: link:../gantt
-      '@northmatter-ai/schedule-commands':
+      '@northmatter/schedule-commands':
         specifier: workspace:*
         version: link:../schedule-commands
-      '@northmatter-ai/schedule-engine':
+      '@northmatter/schedule-engine':
         specifier: workspace:*
         version: link:../schedule-engine
     devDependencies:
@@ -257,13 +257,13 @@ importers:
 
   packages/gantt:
     dependencies:
-      '@northmatter-ai/calendar':
+      '@northmatter/calendar':
         specifier: workspace:*
         version: link:../calendar
-      '@northmatter-ai/schedule-commands':
+      '@northmatter/schedule-commands':
         specifier: workspace:*
         version: link:../schedule-commands
-      '@northmatter-ai/schedule-engine':
+      '@northmatter/schedule-engine':
         specifier: workspace:*
         version: link:../schedule-engine
       '@tanstack/react-virtual':
@@ -285,28 +285,28 @@ importers:
 
   packages/schedule-commands:
     dependencies:
-      '@northmatter-ai/calendar':
+      '@northmatter/calendar':
         specifier: workspace:*
         version: link:../calendar
-      '@northmatter-ai/schedule-engine':
+      '@northmatter/schedule-engine':
         specifier: workspace:*
         version: link:../schedule-engine
 
   packages/schedule-engine:
     dependencies:
-      '@northmatter-ai/calendar':
+      '@northmatter/calendar':
         specifier: workspace:*
         version: link:../calendar
 
   packages/schedule-io:
     dependencies:
-      '@northmatter-ai/calendar':
+      '@northmatter/calendar':
         specifier: workspace:*
         version: link:../calendar
-      '@northmatter-ai/schedule-commands':
+      '@northmatter/schedule-commands':
         specifier: workspace:*
         version: link:../schedule-commands
-      '@northmatter-ai/schedule-engine':
+      '@northmatter/schedule-engine':
         specifier: workspace:*
         version: link:../schedule-engine
       fast-xml-parser:

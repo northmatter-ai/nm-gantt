@@ -1,5 +1,5 @@
-import type { CalendarInput, Minutes } from '@northmatter-ai/calendar';
-import type { ActivityInput, LinkInput, ScheduleInput, ScheduleResult, ScheduleSettings } from '@northmatter-ai/schedule-engine';
+import type { CalendarInput, Minutes } from '@northmatter/calendar';
+import type { ActivityInput, LinkInput, ScheduleInput, ScheduleResult, ScheduleSettings } from '@northmatter/schedule-engine';
 
 /** An activity as stored in a schedule version (spec: Data model → activity). */
 export interface ActivityRecord extends ActivityInput {
