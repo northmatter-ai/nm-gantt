@@ -1,6 +1,6 @@
 // Packs every publishable package the way `pnpm publish` would and checks the tarball:
 // - no `workspace:` ranges left, no `private`, licence MIT and LICENSE file present;
-// - every `exports` / `main` / `types` target exists in the tarball;
+// - every `exports` / `main` / `types` target exists in the tarball, and `exports["."]` has a `default`;
 // - no test files, no .ts worker URL left in dist.
 // Run after `pnpm build:packages` (or use `pnpm check:packages`, which builds first).
 import { execFileSync } from 'node:child_process';
@@ -28,6 +28,9 @@ for (const dir of readdirSync(join(root, 'packages'))) {
   for (const k of ['dependencies', 'peerDependencies']) {
     for (const [d, v] of Object.entries(pkg[k] ?? {})) if (String(v).startsWith('workspace:')) fail(name, `${d}@${v} not rewritten`);
   }
+  // CommonJS consumers (NestJS, Jest) resolve without the `import` condition; Node 22+ can require() the ESM build.
+  const main = pkg.exports?.['.'];
+  if (!main || typeof main !== 'object' || !main.default) fail(name, 'exports["."] has no "default" condition, so require() fails');
   const targets = [pkg.main, pkg.types];
   const walk = (v) => (typeof v === 'string' ? targets.push(v) : v && Object.values(v).forEach(walk));
   walk(pkg.exports);

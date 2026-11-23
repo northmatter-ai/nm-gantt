@@ -1,6 +1,6 @@
 {
   "name": "@northmatter/construction-views",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Construction views for NorthMatter schedules: tower × floor grid, line of balance and look-ahead.",
   "keywords": [
     "scheduling",
@@ -39,7 +39,8 @@
     "exports": {
       ".": {
         "types": "./dist/index.d.ts",
-        "import": "./dist/index.js"
+        "import": "./dist/index.js",
+        "default": "./dist/index.js"
       },
       "./views.css": "./dist/views.css"
     },

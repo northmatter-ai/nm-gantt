@@ -1,6 +1,6 @@
 {
   "name": "@northmatter/schedule-engine",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "CPM scheduling engine: forward/backward pass, constraints, float and critical path, MS Project-compatible.",
   "keywords": [
     "scheduling",
@@ -38,7 +38,8 @@
     "exports": {
       ".": {
         "types": "./dist/index.d.ts",
-        "import": "./dist/index.js"
+        "import": "./dist/index.js",
+        "default": "./dist/index.js"
       }
     },
     "main": "./dist/index.js",
