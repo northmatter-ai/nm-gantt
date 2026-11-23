@@ -2,7 +2,7 @@
 
 All `@northmatter-ai/*` packages share one version. See [RELEASING.md](RELEASING.md).
 
-## 0.1.0 — unreleased
+## 0.1.0 — 2026-11-23
 
 First public release, MIT-licensed. It's a preview: the engine hasn't been checked against real MS Project files to the minute yet (README → "Status against the build plan").
 
