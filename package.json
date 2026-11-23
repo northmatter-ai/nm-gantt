@@ -21,7 +21,8 @@
     "check:packages": "pnpm build:packages && node scripts/check-packages.mjs",
     "release": "pnpm run ci && pnpm check:packages && pnpm -r --filter \"./packages/*\" publish --access public",
     "set-version": "node scripts/set-version.mjs",
-    "release:dry": "pnpm check:packages && pnpm -r --filter \"./packages/*\" publish --access public --dry-run --no-git-checks"
+    "release:dry": "pnpm check:packages && pnpm -r --filter \"./packages/*\" publish --access public --dry-run --no-git-checks",
+    "pack:local": "pnpm build:packages && rm -rf ../nm-tgz && mkdir -p ../nm-tgz && pnpm -r --filter \"./packages/*\" exec pnpm pack --pack-destination ../../../nm-tgz"
   },
   "devDependencies": {
     "@playwright/test": "1.49.1",
