@@ -1,5 +1,7 @@
 # nm-gantt — NorthMatter scheduling engine and Gantt
 
+**[Live demo →](https://northmatter-ai.github.io/nm-gantt/)** &nbsp;·&nbsp; [npm](https://www.npmjs.com/org/northmatter) &nbsp;·&nbsp; [Changelog](CHANGELOG.md)
+
 A critical path scheduling engine and React Gantt chart, MIT-licensed and published on npm under `@northmatter`. This repo builds it from the build spec "Scheduling Engine & Gantt — Build Spec" (Claude Docs). Where code and spec disagree, the spec wins. Interpretations are recorded in [DECISIONS.md](DECISIONS.md).
 
 ## Packages
@@ -30,6 +32,10 @@ import '@northmatter/gantt/gantt.css';
 ```
 
 The packages are ES modules only and need a bundler that handles `new URL('./x.js', import.meta.url)` workers (Vite, webpack 5, Rollup, Parcel). To publish a new version, see [RELEASING.md](RELEASING.md).
+
+## Live demo
+
+https://northmatter-ai.github.io/nm-gantt/ is the demo app in `apps/demo`, rebuilt from `master` on every push by [.github/workflows/demo.yml](.github/workflows/demo.yml). It has no backend: schedules you create or import are kept in your own browser (localStorage), and **Reset** restores the sample. `?view=phone` opens the phone view.
 
 ## Run it
 
