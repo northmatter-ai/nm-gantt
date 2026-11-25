@@ -1,5 +1,7 @@
 # @northmatter/construction-views
 
+**[Live demo](https://northmatter-ai.github.io/nm-gantt/)** (Tower × floor, Line of balance and Look-ahead tabs) · [Source](https://github.com/northmatter-ai/nm-gantt)
+
 The three high-rise views from the spec. They read the same schedule version and results as the Gantt and use its time-scale utilities.
 
 | Component | What it shows |

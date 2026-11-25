@@ -1,5 +1,7 @@
 # @northmatter/gantt
 
+**[Live demo](https://northmatter-ai.github.io/nm-gantt/)** · [Source](https://github.com/northmatter-ai/nm-gantt)
+
 React Gantt chart: a tree grid and an SVG timeline sharing one vertical scroll, virtualised with `@tanstack/react-virtual`.
 
 **Props** follow the spec's component contract: `version`, `mode`, `columns`, `zoom`, `showBaselineId`, `filter`, `groupBy`, `onCommands`, `onSelect`, plus `showFloat`, `compact`, `locale` (`en`/`hi`), `today`, `userKey` and `createWorker`. A `ref` exposes `undo`, `redo`, `scrollToDate`, `addActivity`, `expandAll` and `collapseAll`.
